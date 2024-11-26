@@ -1,16 +1,16 @@
+@push('scripts')
 @if(Session::get('success', false))
-<?php $data = Session::get('success'); ?>
+<?php $data = session()->get('success'); ?>
 @if (is_array($data))
 @foreach ($data as $msg)
-<div class="alert alert-success" role="alert">
-    <i class="fa fa-check"></i>
-    {{ $msg }}
-</div>
+<script>
+    toastr.success("{{ $msg }}");
+</script>
 @endforeach
 @else
-<div class="alert alert-success" role="alert">
-    <i class="fa fa-check"></i>
-    {{ $data }}
-</div>
+<script>
+    toastr.success("{{ $data }}");
+</script>
 @endif
 @endif
+@endpush

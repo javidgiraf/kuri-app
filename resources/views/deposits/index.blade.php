@@ -16,16 +16,6 @@
         <div class="row">
             <div class="col-lg-12">
 
-                @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-
 
 
 
@@ -130,13 +120,15 @@
 
 
         if ($("#payment_method").val() == "") {
-            $("#frmtrasaction").addClass('alert alert-danger').text("Please enter Payment Method!");
+            $("#payment_method").addClass('is-invalid');
+            $(".payment_method").addClass('invalid-feedback').text("Please enter Payment Method!");
             return false;
         } else {
             if ($("#payment_method").val() != "cash") {
-                transaction_no
+                
                 if ($("#transaction_no").val() == "") {
-                    $("#frmtrasaction").addClass('alert alert-danger').text("Please enter Transaction No!");
+                    $("#transaction_no").addClass('is-invalid');
+                    $(".transaction_no").addClass('invalid-feedback').text("Please enter Transaction No!");
                     return false;
                 }
             }

@@ -47,8 +47,7 @@
                                     <td>{{$district->code}}</td>
 
                                     <td><a href="{{route('districts.edit',encrypt($district->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $district->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteDistrict('{{ $district->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
 
                                     <form method="post" action="{{route('districts.destroy', encrypt($district->id))}}" style="display:none" id="delete-form-{{$district->id}}">
@@ -78,3 +77,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteDistrict(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this district ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+</script>
+@endpush

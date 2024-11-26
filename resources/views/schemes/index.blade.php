@@ -24,7 +24,7 @@
                     </div>
                     <div class="card-body">
 
-                        
+
                         @include('layouts.partials.messages')
                         <!-- Table with stripped rows -->
                         <table class="table table-striped">
@@ -32,7 +32,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Scheme</th>
-                                      <th scope="col">Scheme Type</th>
+                                    <th scope="col">Scheme Type</th>
                                     <th scope="col">Total Period (months)</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -45,8 +45,7 @@
                                     <td>{{ $scheme->schemeType?->title }}</td>
                                     <td>{{$scheme->total_period}}</td>
                                     <td><a href="{{route('schemes.edit',encrypt($scheme->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $scheme->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteScheme('{{ $scheme->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
 
                                     <form method="post" action="{{route('schemes.destroy', encrypt($scheme->id))}}" style="display:none" id="delete-form-{{$scheme->id}}">
@@ -70,3 +69,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteScheme(id) {
+        
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this Scheme ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-'+id).submit();
+                }
+            });
+    }
+</script>
+@endpush

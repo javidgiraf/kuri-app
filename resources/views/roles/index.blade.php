@@ -27,7 +27,7 @@
                         @include('layouts.partials.messages')
                         <!-- Table with stripped rows -->
                         <table class="table table-striped">
-                            
+
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -42,8 +42,7 @@
                                     <td>{{$role->name}}</td>
 
                                     <td><a href="{{route('roles.edit',$role->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $role->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteRole('{{ $role->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
 
                                     <form method="post" action="{{route('roles.destroy', $role->id)}}" style="display:none" id="delete-form-{{$role->id}}">
@@ -73,3 +72,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteRole(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this role ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+</script>
+@endpush

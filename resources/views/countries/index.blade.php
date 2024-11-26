@@ -45,8 +45,7 @@
                                     <td>{{$country->code}}</td>
 
                                     <td><a href="{{route('countries.edit',encrypt($country->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $country->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteCountry('{{ $country->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
 
                                     <form method="post" action="{{route('countries.destroy', encrypt($country->id))}}" style="display:none" id="delete-form-{{$country->id}}">
@@ -76,3 +75,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteCountry(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this country ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+</script>
+@endpush

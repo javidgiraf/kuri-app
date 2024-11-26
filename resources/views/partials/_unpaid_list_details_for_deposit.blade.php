@@ -91,6 +91,7 @@
                        <label for="inputEmail3" class="col-sm-12 col-form-label">Transaction No</label>
                        <div class="col-sm-12">
                          <input type="text" class="form-control" id="transaction_no" name="transaction_no">
+                         <span class="transaction_no"></span>
                         </div>
                      </div>
                      <div class="row mb-3">

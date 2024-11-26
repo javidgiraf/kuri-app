@@ -45,8 +45,7 @@
                                     <td>{{$setting->option_value}}</td>
 
                                     <td><a href="{{route('settings.edit',encrypt($setting->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $setting->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
 
                                     <form method="post" action="{{route('settings.destroy', encrypt($setting->id))}}" style="display:none" id="delete-form-{{$setting->id}}">
@@ -77,3 +76,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteSetting(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this Setting ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+</script>
+@endpush

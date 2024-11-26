@@ -47,8 +47,7 @@
                                     <td>{{$state->code}}</td>
 
                                     <td><a href="{{route('states.edit',encrypt($state->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $state->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteState('{{ $state->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
 
                                     <form method="post" action="{{route('states.destroy', encrypt($state->id))}}" style="display:none" id="delete-form-{{$state->id}}">
@@ -78,3 +77,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deleteState(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this state ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+</script>
+@endpush

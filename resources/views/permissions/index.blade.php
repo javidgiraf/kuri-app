@@ -44,8 +44,7 @@
                                     <th>{{$permission->name}}</th>
                                     <td>{{$permission->guard_name}}</td>
 
-                                    <td><a href="{{route('permissions.edit',$permission->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a><a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $permission->id }}').submit();"><i class="bi bi-x-circle"></i></a></td>
+                                    <td><a href="{{route('permissions.edit',$permission->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a><a href="javascript:void(0);" onclick="event.preventDefault(); deletePermission('{{ $permission->id }}');"><i class="bi bi-x-circle"></i></a></td>
                                     <form method="post" action="{{route('permissions.destroy', $permission->id)}}" style="display:none" id="delete-form-{{$permission->id}}">
                                         @csrf
                                         @method('DELETE')
@@ -73,3 +72,23 @@
 
 </main>
 @endsection
+
+@push('scripts')
+<script>
+    function deletePermission(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this permission ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+</script>
+@endpush
