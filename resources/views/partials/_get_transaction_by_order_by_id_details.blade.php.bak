@@ -1,0 +1,23 @@
+<h5 class="card-title" style="text-align: left;">Transaction Details</h5>
+<div class="ps-3">
+    <dl class="row">
+        <dt class="col-sm-2">Transaction No </dt>
+        <dt class="col-sm-1 head">:</dt>
+        <dd class="col-sm-9">{{$get_transaction_by_order['transaction_no']}}</dd>
+        <dt class="col-sm-2">Final Amount</dt>
+        <dt class="col-sm-1 head">:</dt>
+        <dd class="col-sm-9">{{$get_transaction_by_order['paid_amount']}}</dd>
+
+        <dt class="col-sm-2">Receipt</dt>
+        <dt class="col-sm-1 head">:</dt>
+        <dd class="col-sm-9"><a href="{{ asset('storage/' . $transactionDetails['receipt_upload']) }}" target="_blank"><img src="{{ asset('storage/' . $get_transaction_by_order['receipt_upload']) }}" style="width:10%"></a></dd>
+
+        <dt class="col-sm-2">Remark</dt>
+        <dt class="col-sm-1 head">:</dt>
+        <dd class="col-sm-9">{{$get_transaction_by_order['remark']}}</dd>
+
+
+        <!-- Add more dt/dd pairs as needed -->
+    </dl>
+
+</div
