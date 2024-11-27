@@ -167,7 +167,7 @@
             success: function(response) {
                 $('#loading').hide();
                 $('#exampleModal').modal('hide');
-                $('.success').addClass('alert alert-success').html('Deposit Added Successfully');
+                toastr.success('Deposit Added Successfully');
                 for (var i = 0; i < checkedPermissions.length; i++) {
                     var permission = checkedPermissions[i];
                     var id = permission.date;

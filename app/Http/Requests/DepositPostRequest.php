@@ -25,7 +25,6 @@ class DepositPostRequest extends FormRequest
             'payment_method' => 'required',
             'transaction_no' => 'required|unique:transaction_details,transaction_no',
             'receipt_upload'     => 'mimes:jpeg,png,jpg,gif,svg,pdf|max:2048',
-
         ];
     }
 }
