@@ -48,15 +48,11 @@
                   <td>{{ $setting->min_payable_amount }}</td>
                   <td>{{ $setting->denomination }}</td>
                   <td>{{ $setting->due_duration }}</td>
-                  <td>{{ $setting->status }}</td>
-                  <td><a href="{{route('scheme-settings.edit',$setting->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                      <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSchemeSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                  <td>{{ ($setting->status == true) ? __('Active') : __('Inactive') }}</td>
+                  <td>
+                    <a href="{{route('scheme-settings.edit',$setting->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                      
                   </td>
-
-                  <form method="post" action="{{route('scheme-settings.destroy', $setting->id)}}" style="display:none" id="delete-form-{{$setting->id}}">
-                      @csrf
-                      @method('DELETE')
-                  </form>
                 </tr>
                 @endforeach
               </tbody>

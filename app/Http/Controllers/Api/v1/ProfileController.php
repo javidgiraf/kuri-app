@@ -18,6 +18,7 @@ use App\Models\Deposit;
 use App\Models\DepositPeriod;
 use App\Models\GoldRate;
 use App\Models\GoldDeposit;
+use Hash;
 use Carbon\Carbon;
 use App\Helpers;
 use App\Models\RazorpayTransaction;
@@ -26,19 +27,22 @@ use Razorpay\Api\Api;
 use App\Models\TransactionDetail;
 use App;
 use App\Models\SchemeSetting;
-use App\Traits\Firebase;
-use Illuminate\Support\Facades\Hash;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+
+
 
 class ProfileController extends Controller
 {
   //
 
-  use Firebase;
-  
+
+
   public function profile()
   {
     $id = auth()->user()->id;
-    $user = User::with('customer')->with('nominee')->where('id', $id)->first();
+    $user = User::with('customer')->with('nominee')->whereId($id)->first();
     $address = Address::with('country')->with('state')->with('district')->where('user_id', $id)->first();
     return response()->json([
       'user' => $user,
@@ -65,6 +69,7 @@ class ProfileController extends Controller
       'nominee_name' => 'required',
       'nominee_relationship' => 'required',
       'nominee_phone' => 'required',
+     
     ]);
     $password =  (isset($request->password) && $request->password) ? $request->password : '123456';
     $password = Hash::make($password);
@@ -146,35 +151,55 @@ class ProfileController extends Controller
       $startDate = $subscription->start_date;
 
       $schemeTitle = trans("messages.scheme_title_". $scheme->scheme_type_id);
+     
 
-    if($schemeType->flexibility_duration==""){
-      
-         $schemeStatus = false;
-    }else{
+      if($schemeType->flexibility_duration==""){
+
+        $schemeStatus = false;
+      }else{
 
         $startDate = Carbon::parse($subscription->start_date);
-     
+
         $sevenMonthsLater = $startDate->copy()->addMonths($schemeType->flexibility_duration);
 
         $currentMonth = now()->format('Y-m');
         $sevenMonthsMonth = $sevenMonthsLater->format('Y-m');
-       
+
         if ($currentMonth > $sevenMonthsMonth) {
-        
+
           $schemeStatus = false;
         }else{
-           
+
           $schemeStatus = true;
         }
-    }
+      }
 
+      $currentMonth = now()->format('Y-m');
+
+      // Check if a deposit exists for the current month
+      $depositExistsThisMonth = $subscription->deposits->contains(function ($deposit) use ($currentMonth) {
+        return Carbon::parse($deposit->paid_at)->format('Y-m') === $currentMonth && $deposit->status == 1;
+      });
+
+
+      $dueDate = $schemeSetting ? now()->startOfMonth()->addDays($schemeSetting->due_duration - 1) : null;
+
+
+      $isDue = false;
+      if ($dueDate) {
+        $isDue = !$depositExistsThisMonth && now()->greaterThan($dueDate);
+      }
+      $holdStatus = false;
+      if ($dueDate) {
+        $holdStatus = now()->isAfter($dueDate) && !now()->isSameDay($dueDate);
+      }
 
 
       $currentMonth = Carbon::now()->format('Y-m');
       $depositExistsThisMonth = $subscription->deposits->contains(function ($deposit) use ($currentMonth) {
         return Carbon::parse($deposit->paid_at)->format('Y-m') === $currentMonth && $deposit->status == 1;
       });
-       $dueDate = $schemeSetting ? Carbon::now()->startOfMonth()->addDays($schemeSetting->due_duration - 1)->format('Y-m-d') : null;
+      $dueDate = $schemeSetting ? Carbon::now()->startOfMonth()->addDays($schemeSetting->due_duration - 1)->format('Y-m-d') : null;
 
       return [
         'id' => $subscription->id,
@@ -186,7 +211,11 @@ class ProfileController extends Controller
         'is_flexible' => $schemeStatus,
         'title' => $schemeTitle,
         'date' => $dueDate,
+        'is_due' => $isDue,
+        'hold_status' => $holdStatus,
         'have_paid' => $depositExistsThisMonth,
+        'payment_terms' => trans("messages.payment_terms"),
+        
       ];
     });
 
@@ -312,11 +341,11 @@ class ProfileController extends Controller
 
   public function current_plan_history($scheme_id)
   {
-      
+
     $id = auth()->user()->id;
-    
+
     $user_subscription = UserSubscription::with(['deposits','scheme','schemeSetting','scheme.schemeType'])->where('user_id', $id)->where('scheme_id', $scheme_id)->first();
-  
+
     $user_subscription_deposits = Deposit::where('subscription_id', $user_subscription->id)->where('status','1')->get();
 
     if ($user_subscription_deposits != "") {
@@ -333,24 +362,24 @@ class ProfileController extends Controller
       $schemeSetting = $user_subscription->schemeSetting;
       $balance_amount = $user_subscription->scheme->total_amount - $sum;
       $payment_history = [];
- $schemeType = $user_subscription->scheme->schemeType;
+      $schemeType = $user_subscription->scheme->schemeType;
       $isGold = $schemeType && strtolower($schemeType->shortcode ) === 'gold' ? true : false;
 
-  foreach ($user_subscription_deposits as $dp) {
-    $paymentData = [
-        'scheme_amount' => $dp->final_amount,
-        'paid_at' => Carbon::parse($dp->paid_at)->format('d-m-Y'),
-        'status' => $dp->status,
-    ];
+      foreach ($user_subscription_deposits as $dp) {
+        $paymentData = [
+          'scheme_amount' => $dp->final_amount,
+          'paid_at' => Carbon::parse($dp->paid_at)->format('d-m-Y'),
+          'status' => $dp->status,
+        ];
 
-   
-    if ($isGold) {
-        $goldDeposit = GoldDeposit::where('deposit_id', $dp->id)->first();
-         $paymentData['gold_weight'] = $goldDeposit ? number_format($goldDeposit->gold_weight, 2) : null;
-    }
 
-    $payment_history[] = $paymentData;
-   }
+        if ($isGold) {
+          $goldDeposit = GoldDeposit::where('deposit_id', $dp->id)->first();
+          $paymentData['gold_weight'] = $goldDeposit ? number_format($goldDeposit->gold_weight, 2) : null;
+        }
+
+        $payment_history[] = $paymentData;
+      }
 
       $currentMonth = Carbon::now()->format('Y-m');
 
@@ -365,11 +394,11 @@ class ProfileController extends Controller
         $balance_amount = $totalAmount - $sum;
       }
 
-     
+
       if($schemeType->flexibility_duration==""){
-      
-         $isFlexible = false;
-     }else{
+
+        $isFlexible = false;
+      }else{
 
         $startDate = Carbon::parse($user_subscription->start_date);
         $flexibleEndDate = $startDate->copy()->addMonths($schemeType->flexibility_duration);
@@ -382,12 +411,12 @@ class ProfileController extends Controller
         } else {
           $isFlexible = true;
         }
-     }
-    
+      }
+
 
       $is_flexible = $schemeType && strtolower($schemeType->shortcode ) === 'flexible' ? true : false;
       $duration = $schemeSetting->due_duration;
-     
+
 
       $schemeTitle = trans("messages.scheme_title_". $user_subscription->scheme->scheme_type_id);
 
@@ -428,7 +457,7 @@ class ProfileController extends Controller
     ->where('id', $sub_id)
     ->with(['scheme.schemeType'])
     ->first();
-   
+
 
     $existingDeposit = Deposit::where('subscription_id', $sub_id)
     ->whereYear('paid_at', Carbon::now()->year)
@@ -693,9 +722,9 @@ class ProfileController extends Controller
         $transaction = $user_subscription_deposit->transactions->first();
 
         $razorpay_payment_id = $transaction ? $transaction->razorpay_payment_id : null;
-        
-      
-        
+
+
+
         $schemeTitle = trans("messages.scheme_title_".$user_subscription->scheme->schemeType->id);
         $dates_array[] = [
           'deposit_id' => $user_subscription_deposit->id,
@@ -740,72 +769,123 @@ class ProfileController extends Controller
       ]);
 
     }
-      public function token(Request $request)
-  {
-
-
-      $customer = Customer::where('user_id', auth()->id())->first();
-
-      if ($customer) {
-
-          $customer->update([
-              'token_id' => $request->token,
-              'device_type' => $request->device_type,
-          ]);
-
-          $title = "Device Token Saved";
-          $body = "Your device token has been successfully saved.";
-
-          $this->sendNotificationToAll($request->token, $title, $body);
-
-          return response()->json([
-              'message' => 'Device token saved successfully!',
-          ]);
-      }
-
-      return response()->json([
-          'message' => 'Customer not found.',
-      ], 404);
-  }
-  
-  public function sendFirebaseNotification(Request $request)
+  public function token(Request $request)
 {
-    $id = auth()->user()->id;
+   
+    $validated = $request->validate([
+        'token_id' => 'required', 
+        'device_type' => 'required|string', 
+    ]);
 
-    $user_subscription = UserSubscription::with(['deposits', 'user.customer', 'schemeSetting'])
-        ->where('user_id', $id)
-        ->first();
+    
+    $customer = Customer::where('user_id', auth()->id())->first();
 
-    if ($user_subscription) {
-        $due_duration = $user_subscription->schemeSetting->due_duration;
-        $due_date = now()->startOfMonth()->addDays($due_duration - 1);
-        $notification_date = $due_date->copy()->subDays(3);
+    if ($customer) {
+       
+        $customer->update([
+            'token_id' => $validated['token_id'],
+            'device_type' => $validated['device_type'],
+        ]);
 
-        if (now()->isSameDay($notification_date) ||
-            (now()->isBefore($notification_date) && now()->isBefore($due_date)) ||
-            now()->isSameDay($due_date)) {
+        $title = "Device Token Saved";
+        $body = "Your device token has been successfully saved.";
 
-            $token_id = $user_subscription->user->customer->token_id ?? null;
+      
+      
 
-            if ($token_id) {
-                $notification = [
-                    'title' => "testing",
-                    'body' => "body",
-                ];
+        return response()->json([
+            'status' => '1',
+        ]);
+    }
 
-                $fcmNotification = [
-                    'to' => $token_id,
-                    'notification' => $notification,
-                ];
+  
+    return response()->json([
+        'message' => 'Customer not found.',
+    ], 404);
+   }
 
-                $response = $this->sendNotification($fcmNotification);
-                return response()->json($response, 200);
+  
+public function sendNotification()
+{
+
+    $users = UserSubscription::with(['deposits', 'user', 'schemeSetting', 'user.customer'])
+        ->get();
+
+    
+    $messaging = (new Factory)
+        ->withServiceAccount(storage_path('app/google/madhurima-gold-a20be1d55954.json'))
+        ->createMessaging();
+
+   
+    $currentMonth = now()->format('Y-m');
+
+   
+    $due_duration = $users->first()->schemeSetting->due_duration;
+
+    
+    $due_date = now()->startOfMonth()->addDays($due_duration - 1);
+
+    
+    $notification_date = $due_date->copy()->subDays(3); 
+
+   
+    if (now()->between($notification_date->startOfDay(), $due_date->endOfDay())) {
+
+     
+        $tokensToNotify = [];
+
+        foreach ($users as $user_subscription) {
+         
+            $depositExistsThisMonth = $user_subscription->deposits->contains(function ($deposit) use ($currentMonth) {
+                return Carbon::parse($deposit->paid_at)->format('Y-m') === $currentMonth && $deposit->status == 0;
+            });
+
+           
+            if (!$depositExistsThisMonth) {
+              
+                $token_id = $user_subscription->user->customer->token_id ?? null;
+
+              
+                if ($token_id && !in_array($token_id, $tokensToNotify)) {
+                    $tokensToNotify[] = $token_id; // Collect token IDs
+                } elseif (!$token_id) {
+                 
+                    \Log::warning("Token ID is missing for user: {$user_subscription->user_id}");
+                }
+            }
+        }
+
+      
+        if (!empty($tokensToNotify)) {
+         
+            $title = "Payment Reminder";
+            $body = "Your payment is due on {$due_date->format('Y-m-d')}. Please make the payment before the due date.";
+
+          
+            $notification = Notification::create($title, $body);
+
+           
+            $message = CloudMessage::new()
+                ->withNotification($notification)
+                ->withData([
+                   
+                ]);
+
+         
+            try {
+              
+                $response = $messaging->sendMulticast($message, $tokensToNotify);
+
+             
+                \Log::info("One notification sent to multiple users.", ['response' => $response]);
+            } catch (\Throwable $e) {
+             
+                \Log::error("Failed to send notification to users", ['error' => $e->getMessage()]);
             }
         }
     }
 
-    // If no notification is sent
-    return response()->json(['message' => 'No notification sent'], 400);
+    return response()->json(['message' => 'Notification sent successfully!']);
 }
 
   }

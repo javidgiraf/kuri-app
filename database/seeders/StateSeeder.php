@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Country;
+use App\Models\State;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,13 +15,14 @@ class StateSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        DB::table('states')->insert([
-                'country_id' => '1',
-                'name' => "Kerala",
-                'code' => 'KL',
-
-            ],
-        );
+        $json = \Illuminate\Support\Facades\File::get("database/data/states.json");
+        $data = json_decode($json);
+        collect($data)->map(function ($state) {
+            State::updateOrCreate([
+                'name' => $state->name,
+                'code' => $state->code,
+                'country_id' => $state->country_id
+            ]);
+        });
     }
 }

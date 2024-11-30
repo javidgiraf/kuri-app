@@ -15,8 +15,8 @@ class StateController extends Controller
      */
     public function index(StateService $stateService)
     {
-        //
-        $states = $stateService->getStates();
+        $states = $stateService->getStates(20);
+
         return view('states.index', compact('states'));
     }
 

@@ -10,10 +10,13 @@ use Carbon\Carbon;
 class GoldService
 {
 
-    public function getGoldRates(): Object
+    public function getGoldRates($from_date = NULL, $to_date = NULL): Object
     {
 
-        return Goldrate::orderBy('id', 'desc')->paginate(10);
+        return Goldrate::where('date_on', '>=', $from_date)
+                    ->where('date_on', '<=', $to_date)
+                    ->latest()
+                    ->paginate(10);
     }
 
     /**

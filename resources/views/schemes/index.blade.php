@@ -44,14 +44,9 @@
                                     <td>{{$scheme->title}}</td>
                                     <td>{{ $scheme->schemeType?->title }}</td>
                                     <td>{{$scheme->total_period}}</td>
-                                    <td><a href="{{route('schemes.edit',encrypt($scheme->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteScheme('{{ $scheme->id }}');"><i class="bi bi-x-circle"></i></a>
+                                    <td>
+                                        <a href="{{route('schemes.edit',encrypt($scheme->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
                                     </td>
-
-                                    <form method="post" action="{{route('schemes.destroy', encrypt($scheme->id))}}" style="display:none" id="delete-form-{{$scheme->id}}">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
 
                                 </tr>
                                 @endforeach

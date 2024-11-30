@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\SchemeType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,12 +23,21 @@ class UserCreatePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => ['required'],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
             'referrel_code' => ['required', Rule::unique('customers', 'referrel_code')],
-            'mobile' => ['required', Rule::unique('customers', 'mobile')],
+            'mobile' => ['required', 'min:10', 'max:15', 'regex:/^[6-9]\d{9}$/', Rule::unique('customers', 'mobile')],
+            'scheme_id' => ['required', Rule::exists('schemes','id')],
+            'start_date' => ['required'],
+            'subscribe_amount' => ['nullable'],
             'password' => ['required', 'string', 'min:6', 'confirmed']
         ];
+
+        if(request('schemeTypeId') == SchemeType::FIXED_PLAN) {
+            $rules['subscribe_amount'] = ['required', 'numeric'];
+        }
+
+        return $rules;
     }
 }

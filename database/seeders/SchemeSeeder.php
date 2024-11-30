@@ -13,7 +13,7 @@ class SchemeSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        
         $schemes =[[
             'title' => 'Wedding Plan',
             'total_amount' => "300000.00",

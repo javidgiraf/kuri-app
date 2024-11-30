@@ -15,8 +15,8 @@ class DistrictController extends Controller
      */
     public function index(DistrictService $districtService)
     {
-        //
-        $districts = $districtService->getDistricts();
+        $districts = $districtService->getDistricts(20);
+
         return view('districts.index', compact('districts'));
     }
 

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 class Deposit extends Model
 {
     use HasFactory;
@@ -13,7 +12,6 @@ class Deposit extends Model
     protected $fillable = [
         'subscription_id',
         'order_id',
-        'user_type',
         'payment_type',
         'total_scheme_amount',
         'service_charge',
@@ -24,12 +22,28 @@ class Deposit extends Model
         'status',
     ];
 
+    public function subscription()
+    {
+        return $this->hasOne(UserSubscription::class, 'id', 'subscription_id');
+    }
+
     public function deposit_periods()
     {
         return $this->hasMany(DepositPeriod::class, 'deposit_id', 'id');
     }
-    public function subscription()
+
+    public function userSubscription()
     {
-        return $this->hasOne(UserSubscription::class, 'id', 'subscription_id');
+        return $this->belongsTo(UserSubscription::class, 'subscription_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(RazorpayTransaction::class, 'deposit_id', 'id');
+    }
+
+    public function goldDeposits()
+    {
+        return $this->hasMany(GoldDeposit::class, 'deposit_id');
     }
 }

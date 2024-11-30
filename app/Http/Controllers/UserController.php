@@ -30,18 +30,19 @@ class UserController extends Controller
      */
     public function index(UserService $userService)
     {
-        //
-        $users = $userService->getUsers();
+        $users = $userService->getUsers(10);
+
         return view('users.index', compact('users'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(SchemeService $schemeService)
     {
-        //
-        return view('users.create');
+        $schemes = $schemeService->getActiveSchemes();
+
+        return view('users.create', compact('schemes'));
     }
 
     /**
@@ -51,8 +52,10 @@ class UserController extends Controller
     {
         $input = $request->all();
         (isset($input['status']) && $input['status']) ? $input['status'] = 1 : $input['status'] = 0;
-        
-        $userService->createUser($input);
+ 
+        $user = $userService->createUser($input);
+        $input['user_id'] = $user->id;
+        $userService->addUsertoScheme($input);
         LogActivity::addToLog('New User ' . $input['name'] . ' created by' . auth()->user()->name);
 
         return redirect()->route('users.index')->with('success', 'User Created successfully');
@@ -81,20 +84,19 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserUpdatePostRequest $request, string $id, UserService $userService)
+    public function update(UserUpdatePostRequest $request, int $id, UserService $userService)
     {
-        //
         $id = decrypt($id);
         $input = $request->all();
+        $user = User::findOrFail($id);
         (isset($input['status']) && $input['status']) ? $input['status'] = 1 : $input['status'] = 0;
-        $input['password'] =  (isset($input['password']) && $input['password']) ? $input['password'] : '123456';
-        $input['password'] = Hash::make($input['password']);
-        $input['country_id'] = decrypt($input['country_id']);
-        $input['state_id'] = decrypt($input['state_id']);
-        $input['district_id'] = decrypt($input['district_id']);
+        $input['country_id'] = $input['country_id'];
+        $input['state_id'] = $input['state_id'];
+        $input['district_id'] = $input['district_id'];
         $user = $userService->getUser($id);
         $userService->updateUser($user, $input);
         LogActivity::addToLog('User ' . $input['name'] . ' updated by' . auth()->user()->name);
+
         return redirect()->route('users.index')->with('success', 'User Updated successfully');
     }
 
@@ -124,7 +126,6 @@ class UserController extends Controller
             ->render();
          return response()->json(['data' => $data2]);
     }
-
 
     public function currentPlanHistory(Request $request, UserService $userService)
     {
@@ -374,6 +375,7 @@ class UserController extends Controller
     {
         $input = $request->all();
         $userService->addUsertoScheme($input);
+
         return redirect()->route('subscriptions.index')->with('success', 'User Added to scheme successfully');;
     }
 

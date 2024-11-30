@@ -10,11 +10,11 @@ use Carbon\Carbon;
 class DistrictService
 {
 
-    public function getDistricts(): Object
+    public function getDistricts(int $perPage = 10): Object
     {
-
-        return District::all();
+        return District::paginate($perPage);
     }
+
     public function createDistrict(array $userData): District
     {
         $create = [

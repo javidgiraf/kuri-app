@@ -118,6 +118,10 @@
         $("select[name='state_id']").select2({
             placeholder: 'Select a State'
         });
+
+        $("select[name='district_id']").select2({
+            placeholder: 'Select a District'
+        });
     </script>
     @stack('scripts')
     @livewireScripts

@@ -41,7 +41,7 @@
                                 @foreach($states as $state)
 
                                 <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
+                                    <th scope="row">{{ $states->firstItem() + $loop->index }}</th>
                                     <td>{{$state->country->name}}</td>
                                     <td>{{$state->name}}</td>
                                     <td>{{$state->code}}</td>
@@ -59,6 +59,11 @@
                                 @endforeach
 
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5">{{ $states->links() }}</td>
+                                </tr>
+                            </tfoot>
                         </table>
                         <!-- End Table with stripped rows -->
 

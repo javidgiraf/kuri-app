@@ -41,8 +41,8 @@
                             <tbody>
                                 @foreach($districts as $district)
                                 <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{$district->state->name}}</td>
+                                    <th scope="row">{{ $districts->firstItem() + $loop->index }}</th>
+                                    <td>{{ ($district->state) ? $district->state->name : '' }}</td>
                                     <td>{{$district->name}}</td>
                                     <td>{{$district->code}}</td>
 
@@ -59,6 +59,13 @@
                                 @endforeach
 
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5">
+                                        {{ $districts->links() }}
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </table>
                         <!-- End Table with stripped rows -->
 

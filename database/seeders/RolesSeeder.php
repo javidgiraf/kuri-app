@@ -9,8 +9,7 @@ namespace Database\Seeders;
 use Spatie\Permission\Models\Role;
 
 use Illuminate\Database\Seeder;
-
-
+use Illuminate\Support\Facades\DB;
 
 class RolesSeeder extends Seeder
 
@@ -27,21 +26,13 @@ class RolesSeeder extends Seeder
      */
 
     public function run()
-
     {
-
-        $roles = ['admin', 'customer'];
-
-
+        $roles = ['superadmin', 'admin'];
 
         foreach ($roles as $role) {
-
             Role::create([
-
                 'name'       => $role,
-
                 'guard_name' => 'web'
-
             ]);
         }
     }

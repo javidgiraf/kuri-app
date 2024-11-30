@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Customer;
+use App\Models\Nominee;
+use App\Models\SchemeType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserUpdatePostRequest extends FormRequest
 {
@@ -21,22 +25,38 @@ class UserUpdatePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->request->get('id');
-        return [
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id . ',id',
-            'referrel_code' => 'required|unique:customers,referrel_code,' . $id . ',user_id',
-            'mobile' => 'required|unique:customers,mobile,' . $id . ',user_id',
-            //'password' => 'required',
-            'aadhar_number' => 'required|numeric|unique:customers,aadhar_number,' . $id . ',user_id',
-            'address' => 'required',
-            'country_id' => 'required',
-            'state_id' => 'required',
-            'district_id' => 'required',
-            'pincode' => 'required|numeric',
-            'nominee_name' => 'required',
-            'nominee_relationship' => 'required',
-            'nominee_phone' => 'required',
+        $id = decrypt($this->route('user'));
+        $customer_id = Customer::whereUserId($id)->first();
+        $nominee_id = Nominee::whereUserId($id)->first();
+
+        $rules = [
+            'name' => ['required'],
+            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
+            'referrel_code' => ['required', Rule::unique('customers', 'referrel_code')->ignore($customer_id)],
+            'mobile' => [
+                            'required', 
+                            'max:15',
+                            'min:10', 
+                            'regex:/^[6-9]\d{9}$/', 
+                            Rule::unique('customers', 'mobile')->ignore($customer_id),
+                        ],
+            'aadhar_number' => ['required', 'numeric', Rule::unique('customers', 'aadhar_number')->ignore($customer_id)],
+            'address' => ['required'],
+            'country_id' => ['required', Rule::exists('countries', 'id')],
+            'state_id' => ['required', Rule::exists('states', 'id')],
+            'district_id' => ['required', Rule::exists('districts', 'id')],
+            'pincode' => ['nullable', 'numeric', 'min:6'],
+            'nominee_name' => ['required'],
+            'nominee_relationship' => ['required'],
+            'nominee_phone' => [
+                                    'required', 
+                                    'min:10',
+                                    'max:15', 
+                                    'regex:/^[6-9]\d{9}$/', 
+                                    Rule::unique('nominees', 'phone')->ignore($nominee_id)
+                               ],
         ];
+
+        return $rules;
     }
 }

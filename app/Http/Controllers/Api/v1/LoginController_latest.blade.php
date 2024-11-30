@@ -9,12 +9,12 @@ use App\Models\Customer;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Hash;
 use Illuminate\Support\Arr;
 use DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\OtpHelper;
-use Illuminate\Support\Facades\Hash;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Exception\MessagingException;
@@ -24,7 +24,7 @@ use Kreait\Firebase\Exception\MessagingException;
 class LoginController extends Controller
 {
     //
-       public function login(Request $request)
+    public function login(Request $request)
     {
 
         $request->validate([
@@ -32,26 +32,13 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-
-        // $user_count = Customer::where('mobile', $request->username)->count();
-           $user_count = Customer::where(function ($query) use ($request) {
-        $query->where('mobile', $request->username)
-              ->orWhere('referrel_code', $request->username);
-    })->count();
-
-        
+        $user_count = Customer::where('mobile', $request->username)->count();
 
         if (Auth::attempt(array('email' => $request->username, 'password' => $request->password))) {
 
             $user = User::where('email', $request->username)->first();
             $token = $user->createToken('mykuri-app-token')->plainTextToken;
 
-
-                $customer = Customer::where('user_id', $user->id)->first();
-                if ($customer) {
-            $customer->is_verified = '1';
-            $customer->save();
-        }
             $user_out = User::where('email', $request->username)->with('customer')->first();
 
             if ($user_out->customer->is_verified == '1') {
@@ -62,15 +49,25 @@ class LoginController extends Controller
                     'token' => $token,
                     'message' => 'Login Successful',
                 ]);
+            } else {
+
+               // $fourDigitRandomNumber = '4345';
+                $customer = Customer::where('user_id', $user->id)->first();
+                $customer->otp =  OtpHelper::getOtp();
+
+                $customer->is_verified =  '0';
+                $customer->update();
+
+                return response([
+                    'status' => '1',
+                    'user' => $user_out,
+                    'token' => $token,
+                    'message' => 'This user is not verified.Otp is send to your mobile',
+                ]);
             }
         } elseif ($user_count == '1') {
-              
 
-            $customer = Customer::where(function ($query) use ($request) {
-            $query->where('mobile', $request->username)
-                  ->orWhere('referrel_code', $request->username);
-        })->first();
-        
+            $customer = Customer::where('mobile', $request->username)->first();
 
             if (!$customer || !Hash::check($request->password, $customer->password)) {
                 return response([
@@ -78,10 +75,6 @@ class LoginController extends Controller
                     'message' => 'Wrong Credentials',
                 ]);
             } else {
-               
-                $customer = Customer::where('user_id',  $customer->user_id)->first();
-                $customer->is_verified =  '1';
-                $customer->update();
                 $user = User::where('id', $customer->user_id)->first();
                 $token = $user->createToken('mykuri-app-token')->plainTextToken;
                 $user_out = User::where('email', $user->email)->with('customer')->first();
@@ -91,6 +84,19 @@ class LoginController extends Controller
                         'user' => $user_out,
                         'token' => $token,
                         'message' => 'Login Successful',
+                    ]);
+                } else {
+               // $fourDigitRandomNumber = '4345';
+                $customer = Customer::where('user_id', $user->id)->first();
+                $customer->otp =  OtpHelper::getOtp();
+                $customer->is_verified =  '0';
+                $customer->update();
+
+                    return response([
+                        'status' => '1',
+                        'user' => $user_out,
+                        'token' => $token,
+                        'message' => 'This user is not verified',
                     ]);
                 }
             }

@@ -13,13 +13,13 @@ class GoldrateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(GoldService $goldService)
+    public function index(Request $request, GoldService $goldService)
     {
-        //
-
-        $goldrates = $goldService->getGoldRates();
+        $from_date = date("Y-m-d", strtotime($request->from_date));
+        $to_date = date("Y-m-d", strtotime($request->to_date));
+        $goldrates = $goldService->getGoldRates($from_date, $to_date);
+        
         $goldrate_by_id = GoldRate::latest()->first();
-
         $goldrate = $goldService->getGoldRate($goldrate_by_id->id);
         return view('goldrates.index', compact('goldrate', 'goldrates'));
     }

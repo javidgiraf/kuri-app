@@ -93,8 +93,8 @@
             <form method="post" enctype="multipart/form-data" action="{{route('users.store')}}">
               @csrf
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Name <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Name <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <input type="text" id="title" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Enter Name" autocomplete="one-time-code">
                   @error('name')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -102,8 +102,8 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Email <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <input type="email" id="title" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Enter Email" autocomplete="one-time-code">
                   @error('email')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -112,17 +112,51 @@
               </div>
 
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Mobile <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Mobile <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <input type="text" id="title" name="mobile" class="form-control @error('mobile') is-invalid @enderror" value="{{ old('mobile') }}" placeholder="Enter Mobile Number" autocomplete="one-time-code">
                   @error('mobile')
                     <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
                 </div>
               </div>
+
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Password <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Select Scheme <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
+                  <select name="scheme_id" class="form-control select2 @error('scheme_id') is-invalid @enderror" id="scheme_id">
+                    <option value="">Select Scheme</option>
+                    @foreach($schemes as $scheme)
+                      <option data-scheme-type="{{ $scheme->scheme_type_id }}" <?= old('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{ $scheme->id }}" data-val="{{ $scheme->total_period }}">{{ $scheme->title }}</option>
+                    @endforeach
+                  </select>
+                  @error('scheme_id')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <input type="hidden" name="schemeTypeId" id="schemeTypeId">
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-3 col-form-label">Select Date <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
+                  <input type="date" class="form-control @error('start_date') is-invalid @enderror" name="start_date" id="start_date" value="{{ old('start_date') }}">
+                  @error('start_date')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="row mb-3 subscribeAmountDiv d-none">
+                <label for="inputText" class="col-sm-3 col-form-label">Subscribe Amount <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control @error('subscribe_amount') is-invalid @enderror" name="subscribe_amount" value="{{ old('subscribe_amount') }}">
+                  @error('subscribe_amount')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-3 col-form-label">Password <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter Password" autocomplete="one-time-code">
                   @error('password')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -130,14 +164,14 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Confirm Password <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Confirm Password <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <input type="password" id="password-confirm" name="password_confirmation" class="form-control" placeholder="Enter Confirm Password" autocomplete="new-password">
                 </div>
               </div>
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Referrel Code <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Referrel Code <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <input type="text" id="referrel_code" name="referrel_code" class="form-control @error('referrel_code') is-invalid @enderror" value="{{ old('referrel_code') }}" placeholder="Enter Referrel Code" autocomplete="one-time-code" readonly>
                   @error('referrel_code')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -146,8 +180,8 @@
               </div>
               
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-2 col-form-label">Status <span class="text-danger">*</span></label>
-                <div class="col-sm-10">
+                <label for="inputText" class="col-sm-3 col-form-label">Status <span class="text-danger">*</span></label>
+                <div class="col-sm-9">
                   <div id="enabled">
                     <p>Inactive</p>
                     <label class="switch">
@@ -202,7 +236,28 @@
         $("#togBtn").val('0');
       }
     });
-  })
+
+    let schemeTypeId = $("#scheme_id").find('option:selected').data('scheme-type');
+    $("#schemeTypeId").val(schemeTypeId);
+    if($("#scheme_id").find('option:selected').data('scheme-type') == <?= \App\Models\SchemeType::FIXED_PLAN ?>) {
+      $('.subscribeAmountDiv').removeClass('d-none');
+    }
+    else {
+      $('.subscribeAmountDiv').addClass('d-none');
+    }
+
+    $(document).on('change', '#scheme_id', function(){
+      let schemeType = $(this).find("option:selected").data('scheme-type');
+      $("#schemeTypeId").val(schemeType);
+      
+      if(schemeType == <?= \App\Models\SchemeType::FIXED_PLAN ?>) {
+        $(".subscribeAmountDiv").removeClass('d-none');
+      }
+      else {
+        $(".subscribeAmountDiv").addClass('d-none');
+      }
+    });
+  });
 </script>
 
 @endpush

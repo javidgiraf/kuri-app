@@ -27,12 +27,12 @@ use Illuminate\Support\Facades\Hash;
 class UserService
 {
 
-    public function getUsers(): Object
+    public function getUsers(int $perPage = 10): Object
     {
         $users =
             User::whereHas('roles', function ($query) {
                 $query->whereName('customer');
-            })->with('roles')->with('customer')->get();
+            })->with('roles', 'customer')->paginate($perPage);
         return  $users;
     }
 
@@ -61,7 +61,7 @@ class UserService
         $user = User::create([
             'name'     => $userData['name'],
             'email'    => $userData['email'],
-            'password'=> Hash::make($userData['password']),
+            'password' => Hash::make($userData['password']),
         ]);
         $user->assignRole('customer');
 
@@ -88,14 +88,12 @@ class UserService
         $update = [
             'name'    => $userData['name'],
             'email'    => $userData['email'],
-            'password'=> Hash::make($userData['password']),
         ];
         $user->update($update);
         Customer::where('user_id', $user->id)->update([
             'referrel_code' => $userData['referrel_code'],
             'mobile' => $userData['mobile'],
             'aadhar_number' => $userData['aadhar_number'],
-            'password' => Hash::make($userData['password']),
             'status' => $userData['status'],
         ]);
         Address::updateOrCreate(
@@ -120,6 +118,39 @@ class UserService
                 'phone'    => $userData['nominee_phone'],
             ]
         );
+    }
+
+    public static function calculateCompletionPercentage($user)
+    {
+        $fields = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'mobile' => $user->customer->mobile ?? null,
+            'aadhar_number' => $user->customer->aadhar_number ?? null,
+            'address' => $user->address->address ?? null,
+            'country_id' => $user->address->country_id ?? null,
+            'state_id' => $user->address->state_id ?? null,
+            'district_id' => $user->address->district_id ?? null,
+            'pincode' => $user->address->pincode ?? null,
+            'referrel_code' => $user->customer->referrel_code ?? null,
+            'nominee_name' => $user->nominee->name ?? null,
+            'nominee_relationship' => $user->nominee->relationship ?? null,
+            'nominee_phone' => $user->nominee->phone ?? null,
+            'password' => $user->password,
+            'is_verified' => $user->customer->is_verified ?? null,
+            'status' => $user->customer->status ?? null,
+        ];
+
+        $completedFields = 0;
+
+        foreach ($fields as $field) {
+            if (!empty($field)) {
+                $completedFields++;
+            }
+        }
+
+        $totalFields = count($fields);
+        return round(($completedFields / $totalFields) * 100);
     }
 
     public function deleteUser(User $user): void
@@ -277,7 +308,7 @@ class UserService
             'balance_amount' => $balance_amount,
             'result_dates' => $rs_dates,
             'status' => '1',
-            'subscribe_amount' =>$user_subscription->subscribe_amount
+            'subscribe_amount' => $user_subscription->subscribe_amount
         ];
     }
 
@@ -429,12 +460,10 @@ class UserService
         return TransactionHistory::create([
             'deposit_id'    => $userData['deposit_id'],
             'transaction_no'    => $userData['transaction_no'],
-            'payment_method' => 
-                (array_key_exists('payment_method', $userData)) ? 
-                    $userData['payment_method'] : '',
-            'payment_response' => 
-                (array_key_exists('payment_response', $userData)) ? 
-                    $userData['payment_response'] : '',
+            'payment_method' => (array_key_exists('payment_method', $userData)) ?
+                $userData['payment_method'] : '',
+            'payment_response' => (array_key_exists('payment_response', $userData)) ?
+                $userData['payment_response'] : '',
             'paid_amount' => $final_amount,
             'upload_file'    => $receipt_upload,
             'remarks'    => $userData['remark'],
@@ -442,7 +471,8 @@ class UserService
         ]);
     }
 
-    public function saveBankTransfers(array $userData, string $receipt_upload) {
+    public function saveBankTransfers(array $userData, string $receipt_upload)
+    {
         return BankTransfer::create([
             'deposit_id'    => $userData['deposit_id'],
             'transaction_no'    => $userData['transaction_no'],

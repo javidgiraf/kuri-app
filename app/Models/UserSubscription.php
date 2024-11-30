@@ -39,4 +39,9 @@ class UserSubscription extends Model
     {
         return $this->hasMany(Deposit::class, 'subscription_id', 'id');
     }
+
+    public function schemeSetting()
+    {
+        return $this->hasOne(SchemeSetting::class, 'scheme_id', 'scheme_id');
+    }
 }

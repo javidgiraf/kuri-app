@@ -11,11 +11,11 @@ use Carbon\Carbon;
 class StateService
 {
 
-    public function getStates(): Object
+    public function getStates(int $perPage = 10): Object
     {
-
-        return State::all();
+        return State::paginate($perPage);
     }
+
     public function createState(array $userData): State
     {
         $create = [
@@ -55,6 +55,7 @@ class StateService
         // delete scheme
         State::find($state->id)->delete();
     }
+    
     public function getDistrictsbyState($id): Object
     {
         return District::where('state_id', $id)->get();

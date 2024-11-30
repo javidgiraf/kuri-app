@@ -1,3 +1,7 @@
+<?php
+
+use App\Services\UserService;
+?>
 @extends('layouts.page')
 @push('styles')
 <style>
@@ -117,16 +121,16 @@
 
                         @include('layouts.partials.messages')
                         <!-- Table with stripped rows -->
-                        <table class="table table-striped" style="width: 120%;">
-                        
+                        <table class="table table-striped">
+
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
+                                    <th scope="col"></th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Phone</th>
-                                    <th scope="col">Verification Status</th>
-                                    <th scope="col">Profile Completion Status</th>
+                                    <th scope="col">Profile Completion</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -135,26 +139,38 @@
                                 @foreach($users as $user)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{$user->name}}</td>
-                                    <td>{{$user->email}}</td>
-                                    <td>{{isset($user->customer)?$user->customer->mobile:''}}</td>
-                                    <td><span {{isset($user->customer)?($user->customer->is_verified=='1'?  'class=active':'class=inactive'):'class=inactive'}}>{{isset($user->customer)?($user->customer->is_verified=='1'?'Verified':'Not Verified'):'Not Verified'}} </span></td>
                                     <td>
-                                        @if(isset($user->address)||isset($user->nominee))
-                                        @if($user->customer->aadhar_number!=""||$user->customer->mobile!=""||$user->address->address!=""||$user->address->district_id !=""||$user->address->state_id!=""||$user->address->country_id!=""||$user->nominee->name!=""||$user->nominee->relationship!="")
-                                        <span class="active">Completed</span>
-                                        @else
-                                        <span class="inactive">Not completed</span>
-                                        @endif
-                                        @else
-                                        <span class="inactive">Not completed</span>
-                                        @endif
-
-
-
+                                        {{ $user->name }}
                                     </td>
-                                    <td id="status{{$user->id}}"><span {{isset($user->customer)?($user->customer->status=='1'?  'class=active':'class=inactive'):'class=inactive'}}>{{isset($user->customer)?($user->customer->status=='1'?'Active':'Not Active'):'Not Active'}}</span><span style="padding-left: 4px;"> <a data-bs-toggle="modal" class="model" data-bs-target="#ExtralargeModal{{$user->id}}" style="color:blue">
-                                                <i class="bi bi-pencil-square"></i></a></span></td>
+                                    <td>
+                                        <span {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'class=active' : 'class=inactive') : 'class=inactive' }}> {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'Verified' : 'Not Verified') : 'Not Verified' }} </span>
+                                    </td>
+                                    <td>{{$user->email}}</td>
+                                    <td>{{ isset($user->customer) ? $user->customer->mobile : '' }}</td>
+                                    <td>
+                                        <div class="progress mt-1 w-100">
+                                            <div
+                                                class="progress-bar"
+                                                role="progressbar"
+                                                style="width: <?= \App\Services\UserService::calculateCompletionPercentage($user) ?>%;"
+                                                aria-valuenow="<?= \App\Services\UserService::calculateCompletionPercentage($user) ?>"
+                                                aria-valuemin="0"
+                                                aria-valuemax="100">
+                                                {{ \App\Services\UserService::calculateCompletionPercentage($user) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td id="status{{ $user->id }}">
+                                        <span
+                                            {{ isset($user->customer) ? 
+                                                ($user->customer->status == true ? 
+                                                    'class=active' : 'class=inactive') 
+                                                    : 'class=inactive' }}>
+                                            {{ isset($user->customer) ? 
+                                                    ($user->customer->status == true ? 
+                                                        'Active' : 'Not Active') : 'Not Active' }}
+                                        </span>
+                                    </td>
 
                                     <td><a href="{{route('users.edit',encrypt($user->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
                                         <a href="javascript:void(0);" onclick="event.preventDefault();
@@ -166,53 +182,6 @@
                                     </form>
 
                                 </tr>
-                                <div class="modal fade" id="ExtralargeModal{{$user->id}}" tabindex="-1">
-                                    <div class="modal-dialog modal-xl">
-
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-
-                                                    <h5 class="modal-title" id="exampleModalLabel">Change Status of the User</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="row mb-12">
-                                                        <div class="success"></div>
-                                                    </div>
-
-                                                    <div class="row mb-3">
-                                                        <label for="inputText" class="col-sm-2 col-form-label">Status</label>
-                                                        <div class="col-sm-10">
-                                                            <div id="enabled">
-                                                                <p>Inactive</p>
-                                                                <label class="switch">
-                                                                  <input type="checkbox"
-                                                                         id="togBtn{{$user->id}}"
-                                                                         data-id="{{$user->id}}"
-                                                                         class="togBtn"
-                                                                         name="status"
-                                                                         value="{{ optional($user->customer)->status == 1 ? '1' : '' }}"
-                                                                         {{ optional($user->customer)->status == 1 ? 'checked' : '' }}>
-
-                                                                    <span class=" slider"></span>
-                                                                </label>
-                                                                <p>Active</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary btn-change-status" id="{{$user->id}}">Save changes</button>
-                                                    <div class="col-md-12" id="loading{{$user->id}}" style="text-align: center;display:none">
-                                                        <img src="{{asset('assets/img/loading.gif')}}" style="width: 13%;">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 @endforeach
 
                             </tbody>

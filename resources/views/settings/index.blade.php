@@ -44,8 +44,9 @@
                                     <td>{{$setting->option_name}}</td>
                                     <td>{{$setting->option_value}}</td>
 
-                                    <td><a href="{{route('settings.edit',encrypt($setting->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                                    <td>
+                                        <a href="{{route('settings.edit',encrypt($setting->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        
                                     </td>
 
                                     <form method="post" action="{{route('settings.destroy', encrypt($setting->id))}}" style="display:none" id="delete-form-{{$setting->id}}">
