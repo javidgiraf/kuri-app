@@ -43,8 +43,10 @@ class UserSeeder extends Seeder
         $superAdmin = User::create([
             'name'     => 'Super Admin',
             'email'    => 'kuriapp@admin.com',
-            'password' => Hash::make('kuri@1234')
+            'password' => Hash::make('kuri@1234'),
+            'is_admin' => true
         ]);
-        $superAdmin->assignRole('admin');
+        
+        $superAdmin->assignRole('superadmin');
     }
 }

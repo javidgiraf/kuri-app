@@ -120,7 +120,7 @@
                             <td>{{$userSubscription->user?->name}}</td>
                             <td>{{$userSubscription->scheme?->title}}</td>
                         
-                            <td>₹ {{number_format($userSubscription->subscribe_amount,2)}}</td>
+                            <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->subscribe_amount, 2) }}</td>
                             <td>
                                 @php $totalAmount = 0; @endphp
                                 @foreach($userSubscription->deposits as $deposit)
@@ -128,7 +128,7 @@
                                 @php $totalAmount += $deposit->final_amount @endphp
                                 @endif
                                 @endforeach
-                                ₹ {{number_format($totalAmount,2)}}
+                                {{ \App\Models\Setting::CURRENCY }} {{ number_format($totalAmount, 2) }}
                             </td>
                             <td>{{date('d-m-Y', strtotime($userSubscription->start_date))}}</td>
                             <td>{{date('d-m-Y', strtotime($userSubscription->end_date))}}</td>
@@ -195,6 +195,16 @@
     $('#scheme_id').on('change', function(e) {
         var scheme_id = $('#scheme_id').val();
         @this.set('scheme_id', scheme_id);
+    });
+
+    $('#mature_status').on('change', function(e) {
+        var mature_status = $('#mature_status').val();
+        @this.set('mature_status', mature_status);
+    });
+
+    $('#scheme_status').on('change', function(e) {
+        var scheme_status = $('#scheme_status').val();
+        @this.set('scheme_status', scheme_status);
     });
 
     $(document).on('click', '.model', function() {

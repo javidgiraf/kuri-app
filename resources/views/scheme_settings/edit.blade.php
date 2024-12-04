@@ -109,7 +109,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-sm-10">
-                                    <button type="submit" class="btn btn-primary">Update Scheme Setting</button>
+                                    <button type="submit" class="btn btn-primary">{{ __('Update Scheme Setting') }}</button>
                                 </div>
                             </div>
                         </form>

@@ -15,18 +15,18 @@
               <dl class="row">
                 <dt class="col-sm-5">Order Id</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5"> {{$success_deposit_by_order['order_id']}}</dd>
+                <dd class="col-sm-5"> {{ $success_deposit_by_order['order_id'] }}</dd>
 
                 <dt class="col-sm-5">Date</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">{{date('d-m-Y', strtotime($success_deposit_by_order['paid_at']))}}</dd>
+                <dd class="col-sm-5">{{ date('d-m-Y', strtotime($success_deposit_by_order['paid_at'])) }}</dd>
 
                 <dt class="col-sm-5">Total Scheme Amount</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">₹ {{number_format($success_deposit_by_order['total_scheme_amount'],2)}}</dd>
+                <dd class="col-sm-5">{{ \App\Models\Setting::CURRENCY }} {{ number_format($success_deposit_by_order['total_scheme_amount'], 2) }}</dd>
                 <dt class="col-sm-5">User Type</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">{{$success_deposit_by_order['user_type']=='admin'?'Admin':'Customer'}}</dd>
+                <dd class="col-sm-5">{{ $success_deposit_by_order['user_type'] == 'admin' ? 'Admin' : 'Customer' }}</dd>
 
                 <!-- Add more dt/dd pairs as needed -->
               </dl>
@@ -45,19 +45,19 @@
               <dl class="row">
                 <dt class="col-sm-5">Service Charge</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">₹ {{number_format($success_deposit_by_order['service_charge'],2)}}</dd>
+                <dd class="col-sm-5">{{ \App\Models\Setting::CURRENCY }} {{ number_format($success_deposit_by_order['service_charge'], 2) }}</dd>
 
                 <dt class="col-sm-5">GST Charge</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">₹ {{number_format($success_deposit_by_order['gst_charge'],2)}}</dd>
+                <dd class="col-sm-5">{{ \App\Models\Setting::CURRENCY }} {{ number_format($success_deposit_by_order['gst_charge'], 2) }}</dd>
 
                 <dt class="col-sm-5">Final Amount</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">₹ {{number_format($success_deposit_by_order['final_amount'],2)}}</dd>
+                <dd class="col-sm-5">{{ \App\Models\Setting::CURRENCY }} {{ number_format($success_deposit_by_order['final_amount'], 2) }}</dd>
 
                 <dt class="col-sm-5">Payment Type</dt>
                 <dt class="col-sm-1 head">:</dt>
-                <dd class="col-sm-5">{{$success_deposit_by_order['payment_type']}}</dd>
+                <dd class="col-sm-5">{{ $success_deposit_by_order['payment_type'] }}</dd>
 
                 <!-- Add more dt/dd pairs as needed -->
               </dl>
@@ -83,18 +83,18 @@
     <tbody>
       @foreach($success_deposit_by_order['deposit_periods'] as $deposit_period)
       <tr>
-        <th scope="row">{{$loop->iteration}}</th>
-        <td>{{date('d-m-Y', strtotime($deposit_period['due_date']))}}</td>
-        <td>{{$deposit_period['scheme_amount']}}</td>
-        <td>{{$deposit_period['status']==1?($deposit_period['is_due']=='1'?'Payment is Delayed':'Payment on time'):''}}</td>
-        <td>{{$deposit_period['status']=='1'?'Payment Completed':'Incomplete Payments'}}</td>
+        <th scope="row">{{ $loop->iteration }}</th>
+        <td>{{ date('d-m-Y', strtotime($deposit_period['due_date'])) }}</td>
+        <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($deposit_period['scheme_amount'], 2) }}</td>
+        <td>{{ $deposit_period['status'] == 1 ? ($deposit_period['is_due'] == '1' ? 'Payment is Delayed' : 'Payment on time') : '' }}</td>
+        <td>{{ $deposit_period['status']== '1' ? 'Payment Completed' : 'Incomplete Payments' }}</td>
 
       </tr>
       @endforeach
     </tbody>
 
   </table>
-  @if($success_deposit_by_order['payment_type']!='cash')
+  @if($success_deposit_by_order['payment_type'] != 'cash')
   <div class="card-body" id="enter-trasaction-details">
     <h5 class="card-title" style="text-align: left;">Enter Transaction Details</h5>
     <div id="frmtrasaction"></div>

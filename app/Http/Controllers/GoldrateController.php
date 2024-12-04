@@ -15,8 +15,8 @@ class GoldrateController extends Controller
      */
     public function index(Request $request, GoldService $goldService)
     {
-        $from_date = date("Y-m-d", strtotime($request->from_date));
-        $to_date = date("Y-m-d", strtotime($request->to_date));
+        $from_date = ($request->from_date) ? date("Y-m-d", strtotime($request->from_date)) : date('Y-m-01');
+        $to_date = ($request->to_date) ? date("Y-m-d", strtotime($request->to_date)) : date('Y-m-t');
         $goldrates = $goldService->getGoldRates($from_date, $to_date);
         
         $goldrate_by_id = GoldRate::latest()->first();

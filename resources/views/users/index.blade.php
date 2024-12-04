@@ -138,14 +138,16 @@ use App\Services\UserService;
                             <tbody>
                                 @foreach($users as $user)
                                 <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
+                                    <th scope="row">{{ $users->firstItem() + $loop->index }}</th>
                                     <td>
                                         {{ $user->name }}
+                                        <br>
+                                        <p><span {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'class=active' : 'class=inactive') : 'class=inactive' }}> {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'Verified' : 'Not Verified') : 'Not Verified' }} </span></p>
                                     </td>
                                     <td>
-                                        <span {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'class=active' : 'class=inactive') : 'class=inactive' }}> {{ isset($user->customer) ? ($user->customer->is_verified == true ? 'Verified' : 'Not Verified') : 'Not Verified' }} </span>
+                                
                                     </td>
-                                    <td>{{$user->email}}</td>
+                                    <td>{{ $user->email }}</td>
                                     <td>{{ isset($user->customer) ? $user->customer->mobile : '' }}</td>
                                     <td>
                                         <div class="progress mt-1 w-100">
@@ -172,9 +174,10 @@ use App\Services\UserService;
                                         </span>
                                     </td>
 
-                                    <td><a href="{{route('users.edit',encrypt($user->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                                        <a href="javascript:void(0);" onclick="event.preventDefault();
-                                                document.getElementById('delete-form-{{ $user->id }}').submit();"><i class="bi bi-x-circle"></i></a>
+                                    <td>
+                                        <a href="{{ route('users.show', encrypt($user->id)) }}" style="margin-right: 10px;"><i class="bi bi-eye"></i></a>
+                                        <a href="{{ route('users.edit', encrypt($user->id)) }}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        <a href="javascript:void(0);" onclick="event.preventDefault(); deleteUser('{{ $user->id }}');"><i class="bi bi-x-circle"></i></a>
                                     </td>
                                     <form method="post" action="{{route('users.destroy', encrypt($user->id))}}" style="display:none" id="delete-form-{{$user->id}}">
                                         @csrf
@@ -206,6 +209,22 @@ use App\Services\UserService;
 @endsection
 @push('scripts')
 <script>
+    function deleteUser(id) {
+
+        swal({
+                title: "Are you sure ?",
+                text: "Do you want to delete this user ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+    }
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

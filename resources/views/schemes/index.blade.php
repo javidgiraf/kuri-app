@@ -45,9 +45,15 @@
                                     <td>{{ $scheme->schemeType?->title }}</td>
                                     <td>{{$scheme->total_period}}</td>
                                     <td>
-                                        <a href="{{route('schemes.edit',encrypt($scheme->id))}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        <a href="{{ route('schemes.edit', encrypt($scheme->id)) }}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                                        @role('superadmin')
+                                            <a href="javascript:void(0);" onclick="event.preventDefault(); deleteScheme('{{ $scheme->id }}');"><i class="bi bi-x-circle"></i></a>
+                                        @endrole
                                     </td>
-
+                                    <form method="post" action="{{ route('schemes.destroy', encrypt($scheme->id)) }}" style="display:none" id="delete-form-{{ $scheme->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
                                 </tr>
                                 @endforeach
 
@@ -68,7 +74,7 @@
 @push('scripts')
 <script>
     function deleteScheme(id) {
-        
+
         swal({
                 title: "Are you sure ?",
                 text: "Do you want to delete this Scheme ?",
@@ -78,7 +84,7 @@
             })
             .then((willDelete) => {
                 if (willDelete) {
-                    document.getElementById('delete-form-'+id).submit();
+                    document.getElementById('delete-form-' + id).submit();
                 }
             });
     }

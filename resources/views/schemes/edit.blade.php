@@ -93,7 +93,7 @@
               <div class="row mb-3">
 
                 <div class="col-sm-10">
-                  <button type="submit" class="btn btn-primary">Submit Form</button>
+                  <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                 </div>
               </div>
 

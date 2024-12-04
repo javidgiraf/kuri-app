@@ -40,12 +40,13 @@ class UserUpdatePostRequest extends FormRequest
                             'regex:/^[6-9]\d{9}$/', 
                             Rule::unique('customers', 'mobile')->ignore($customer_id),
                         ],
-            'aadhar_number' => ['required', 'numeric', Rule::unique('customers', 'aadhar_number')->ignore($customer_id)],
+            'aadhar_number' => ['nullable', 'numeric', 'regex:/^\d{12}$/', Rule::unique('customers', 'aadhar_number')->ignore($customer_id)],
+            'pancard_no' => ['nullable', 'string', 'regex:/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/', Rule::unique('customers', 'pancard_no')->ignore($customer_id)],
             'address' => ['required'],
             'country_id' => ['required', Rule::exists('countries', 'id')],
             'state_id' => ['required', Rule::exists('states', 'id')],
             'district_id' => ['required', Rule::exists('districts', 'id')],
-            'pincode' => ['nullable', 'numeric', 'min:6'],
+            'pincode' => ['nullable', 'numeric', 'digits:6'],
             'nominee_name' => ['required'],
             'nominee_relationship' => ['required'],
             'nominee_phone' => [
@@ -56,6 +57,10 @@ class UserUpdatePostRequest extends FormRequest
                                     Rule::unique('nominees', 'phone')->ignore($nominee_id)
                                ],
         ];
+
+        if(empty(request('aadhar_number')) && empty(request('pancard_no'))) {
+            $rules['aadhar_number'] = ['required'];
+        }
 
         return $rules;
     }

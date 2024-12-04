@@ -185,28 +185,17 @@
                 $('.btn-add-deposit-model').prop('disabled', true);
             },
             error: function(data) {
-                let err_str = '';
-                $('#loading').hide();
-                $('#exampleModal').modal('hide');
-                $("#frm_transation_details")[0].reset();
+                
                 $.each($('.permission'), function() {
                     $(this).prop('checked', false);
                     $('.btn-add-deposit-model').prop('disabled', true);
                 });
-                if (data.responseJSON.errors) {
-                    loading = false;
-                    $('#loader').html('');
-                    err_str =
-                        '<dl class="row"><dt class="col-sm-3"></dt><dt class="col-sm-9"><p><b>Whoops!</b> There were some problems with your input.</p></dt>';
-                    $.each(data.responseJSON.errors, function(key, val) {
-                        err_str += '<dt class="col-sm-3">' + key.replace("_",
-                                " ") + ' </dt><dd class="col-sm-9">' + val +
-                            '</dd>';
-                    });
-                    err_str += '</dl>';
-                    $('.error_transaction_msg').addClass('alert alert-danger').html(err_str);
-                    return;
-                }
+        
+                    if(data.responseJSON.errors.transaction_no) {
+                        $("#transaction_no").addClass('is-invalid');
+                        $(".transaction_no").addClass('invalid-feedback').text(data.responseJSON.errors.transaction_no[0]);
+                    }
+                
             }
         });
     });

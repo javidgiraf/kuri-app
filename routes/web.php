@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\PermissionsController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionDetailController;
 use App\Http\Controllers\SchemeSettingController;
 use App\Http\Controllers\GoldDepositController;
+use App\Http\Controllers\PasswordController;
 use App\Models\SubscriptionHistory;
 use App\Models\UserSubscription;
 use Carbon\Carbon;
@@ -39,9 +41,7 @@ Route::get('/clear-cache', function () {
 
     Artisan::call('optimize:clear');
 
-    return "All Cache is cleared";
-
-    // return view('cache');
+    return response()->json(['success' => true, 'message' => 'All Cache is cleared']);
 
 })->name('cache.clear');
 
@@ -60,7 +60,10 @@ Route::group(['middleware' => ['auth', 'permission']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index']);
     Route::resource('roles', RolesController::class);
     Route::resource('permissions', PermissionsController::class);
+    Route::resource('admins', AdminController::class);
     Route::resource('users', UserController::class);
+    Route::get('/change-password', [PasswordController::class, 'showChangePasswordForm'])->name('password.change');
+    Route::put('/change-password', [PasswordController::class, 'updatePassword'])->name('password.update');
     Route::resource('schemes', SchemeController::class);
     Route::resource('goldrates', GoldrateController::class);
     Route::resource('countries', CountryController::class);

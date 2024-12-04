@@ -122,6 +122,16 @@
         $("select[name='district_id']").select2({
             placeholder: 'Select a District'
         });
+
+        $(document).on('click', '.btnClearCache', function(){
+            $.ajax({
+                url: "{{ route('cache.clear') }}",
+                type: "GET",
+                success: function(response) {
+                    toastr.success(response.message);
+                }
+            });
+        });
     </script>
     @stack('scripts')
     @livewireScripts

@@ -32,7 +32,7 @@ class UserService
         $users =
             User::whereHas('roles', function ($query) {
                 $query->whereName('customer');
-            })->with('roles', 'customer')->paginate($perPage);
+            })->with('roles', 'customer')->latest()->paginate($perPage);
         return  $users;
     }
 
@@ -94,6 +94,7 @@ class UserService
             'referrel_code' => $userData['referrel_code'],
             'mobile' => $userData['mobile'],
             'aadhar_number' => $userData['aadhar_number'],
+            'pancard_no' => $userData['pancard_no'],
             'status' => $userData['status'],
         ]);
         Address::updateOrCreate(
@@ -127,6 +128,7 @@ class UserService
             'email' => $user->email,
             'mobile' => $user->customer->mobile ?? null,
             'aadhar_number' => $user->customer->aadhar_number ?? null,
+            'pancard_no' => $user->customer->pancard_no ?? null,
             'address' => $user->address->address ?? null,
             'country_id' => $user->address->country_id ?? null,
             'state_id' => $user->address->state_id ?? null,

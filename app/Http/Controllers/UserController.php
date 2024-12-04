@@ -64,9 +64,30 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(UserService $userService, string $id)
     {
-        //
+        $id = decrypt($id);
+        $userSubscription = UserSubscription::with('user', 'scheme')->whereUserId($id)->first();
+        $user_subscription_id = isset($userSubscription) ? $userSubscription->id : NULL;
+        $user_id = isset($userSubscription) ? $userSubscription->user_id : NULL;
+        $scheme_id = isset($userSubscription) ? $userSubscription->scheme_id : NULL;
+        $currency = Setting::CURRENCY;
+
+        $current_plan_history = $userService->getCurrentPlanHistory($user_subscription_id, $user_id, $scheme_id);
+        $success_deposit_lists = $userService->getSuccessDepositList($user_subscription_id, $user_id, $scheme_id);
+        $failed_processing_deposit_lists = $userService->getFailedDepositList($user_subscription_id, $user_id, $scheme_id);
+
+        return view('users.show', 
+            compact(
+                'current_plan_history', 
+                'user_subscription_id', 
+                'user_id', 'scheme_id', 
+                'success_deposit_lists', 
+                'failed_processing_deposit_lists', 
+                'userSubscription',
+                'currency'
+            )
+        );
     }
 
     /**
@@ -84,7 +105,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserUpdatePostRequest $request, int $id, UserService $userService)
+    public function update(UserUpdatePostRequest $request, string $id, UserService $userService)
     {
         $id = decrypt($id);
         $input = $request->all();
@@ -354,7 +375,7 @@ class UserController extends Controller
         $input['id'] = $input['user_id'];
         $input['status'] = $input['status'];
         $data = $userService->changeStatus($input);
-        return response()->json(['data' => $data]);
+        return response()->json(['success' => true, 'message' => 'Status Changed Successfully', 'data' => $data]);
     }
 
     public function userSubscriptions()

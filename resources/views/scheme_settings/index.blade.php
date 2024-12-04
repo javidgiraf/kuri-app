@@ -28,7 +28,7 @@
             @include('layouts.partials.messages')
             <!-- Table with stripped rows -->
             <table class="table table-striped">
-          
+
               <thead>
                 <tr>
                   <th>No</th>
@@ -44,14 +44,16 @@
                 @foreach ($schemeSettings as $setting)
                 <tr>
                   <td>{{ $loop->iteration + ($schemeSettings->currentPage() - 1) * $schemeSettings->perPage() }}</td>
-                  <td>{{ $setting->max_payable_amount }}</td>
-                  <td>{{ $setting->min_payable_amount }}</td>
-                  <td>{{ $setting->denomination }}</td>
+                  <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->max_payable_amount, 2) }}</td>
+                  <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->min_payable_amount, 2) }}</td>
+                  <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->denomination, 2) }}</td>
                   <td>{{ $setting->due_duration }}</td>
                   <td>{{ ($setting->status == true) ? __('Active') : __('Inactive') }}</td>
                   <td>
-                    <a href="{{route('scheme-settings.edit',$setting->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
-                      
+                    <a href="{{route('scheme-settings.edit', $setting->id)}}" style="margin-right: 10px;"><i class="bi bi-pencil-square"></i></a>
+                    @role('superadmin')
+                      <a href="javascript:void(0);" onclick="event.preventDefault(); deleteSchemeSetting('{{ $setting->id }}');"><i class="bi bi-x-circle"></i></a>
+                    @endrole
                   </td>
                 </tr>
                 @endforeach
@@ -72,20 +74,20 @@
 
 @push('scripts')
 <script>
-    function deleteSchemeSetting(id) {
+  function deleteSchemeSetting(id) {
 
-        swal({
-                title: "Are you sure ?",
-                text: "Do you want to delete this Scheme Setting ?",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    document.getElementById('delete-form-' + id).submit();
-                }
-            });
-    }
+    swal({
+        title: "Are you sure ?",
+        text: "Do you want to delete this Scheme Setting ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          document.getElementById('delete-form-' + id).submit();
+        }
+      });
+  }
 </script>
 @endpush

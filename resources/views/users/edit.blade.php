@@ -117,7 +117,7 @@
               <div class="row mb-3">
                 <label for="inputText" class="col-sm-3 col-form-label">Mobile <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
-                  <input type="text" id="mobile" name="mobile" class="form-control @error('mobile') is-invalid @enderror" value="{{ old('mobile', $user->customer->mobile) }}" placeholder="Enter Mobile Number" autocomplete="one-time-code">
+                  <input type="text" id="mobile" name="mobile" class="form-control @error('mobile') is-invalid @enderror" value="{{ ($user->customer) ? old('mobile', $user->customer->mobile) : old('mobile') }}" placeholder="Enter Mobile Number" autocomplete="one-time-code">
                   @error('mobile')
                     <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
@@ -131,7 +131,7 @@
                   <input type="text" 
                       id="referrel_code" name="referrel_code" 
                       class="form-control @error('referrel_code') is-invalid @enderror" 
-                      value="{{ old('referrel_code', $user->customer->referrel_code) }}" 
+                      value="{{ ($user->customer) ? old('referrel_code', $user->customer->referrel_code) : old('referrel_code') }}" 
                       placeholder="Enter Referrel Code" autocomplete="one-time-code" readonly>
                   @error('referrel_code')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -141,8 +141,18 @@
               <div class="row mb-3">
                 <label for="inputText" class="col-sm-3 col-form-label">Aadhaar No <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
-                  <input type="text" id="aadhar_number" name="aadhar_number" class="form-control @error('aadhar_number') is-invalid @enderror" value="{{ old('aadhar_number', $user->customer->aadhar_number) }}" placeholder="Enter Aadhaar No" autocomplete="one-time-code">
+                  <input type="text" id="aadhar_number" name="aadhar_number" class="form-control @error('aadhar_number') is-invalid @enderror" value="{{ ($user->customer) ? old('aadhar_number', $user->customer->aadhar_number) : old('aadhar_number') }}" placeholder="Enter Aadhaar No" autocomplete="one-time-code">
                   @error('aadhar_number')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                  @enderror
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="inputText" class="col-sm-3 col-form-label">Pancard No</label>
+                <div class="col-sm-9">
+                  <input type="text" id="pancard_no" name="pancard_no" class="form-control @error('pancard_no') is-invalid @enderror" value="{{ ($user->customer) ? old('pancard_no', $user->customer->pancard_no) : old('pancard_no') }}" placeholder="Enter Pancard No" autocomplete="one-time-code">
+                  @error('pancard_no')
                     <span class="invalid-feedback">{{ $message }}</span>
                   @enderror
                 </div>
@@ -165,7 +175,7 @@
               <div class="row mb-3">
                 <label for="inputText" class="col-sm-3 col-form-label">State <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
-                  <input type="hidden" name="country_id" id="country_id" value="{{ encrypt(\App\Models\Country::COUNTRY_ID) }}">
+                  <input type="hidden" name="country_id" id="country_id" value="{{ \App\Models\Country::COUNTRY_ID }}">
                   <select name="state_id" id="state_id" class="form-control @error('state_id') is-invalid @enderror">
 
                   </select>
@@ -175,7 +185,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-3 col-form-label">Districts <span class="text-danger">*</span></label>
+                <label for="inputText" class="col-sm-3 col-form-label">District <span class="text-danger">*</span></label>
                 <div class="col-sm-9">
 
                   <select name="district_id" id="district_id" class="form-control @error('district_id') is-invalid @enderror">
@@ -187,7 +197,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <label for="inputText" class="col-sm-3 col-form-label">Pin code <span class="text-danger">*</span></label>
+                <label for="inputText" class="col-sm-3 col-form-label">Pin code</label>
                 <div class="col-sm-9">
 
                   <input type="text" id="pincode" name="pincode" class="form-control @error('pincode') is-invalid @enderror" value="{{ isset($user->address) ? old('pincode', $user->address->pincode) : old('pincode') }}" placeholder="Enter Pin Code" autocomplete="one-time-code">
@@ -235,7 +245,7 @@
                   <div id="enabled">
                     <p>Inactive</p>
                     <label class="switch">
-                      <input type="checkbox" id="togBtn" name="status" value="{{ $user->customer->status == true ? true : false }}" {{ $user->customer->status == true ? 'checked' : '' }}>
+                      <input type="checkbox" id="togBtn" name="status" value="{{ ($user->customer) ? ($user->customer->status == true ? true : false) : false }}" {{ ($user->customer) ? ($user->customer->status == true ? 'checked' : '') : '' }}>
                       <span class=" slider"></span>
                     </label>
                     <p>Active</p>
@@ -246,7 +256,7 @@
 
               <div class="row mb-3">
                 <div class="col-sm-10">
-                  <button type="submit" class="btn btn-primary">Submit Form</button>
+                  <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                 </div>
               </div>
 
@@ -281,8 +291,8 @@
 
   $(document).ready(function() {
     var country_id = $('#country_id').val();
-    var state_id = "{{ isset($user->address->state_id) ? decrypt($user->address->state_id) : '' }}";
-    var district_id = "{{ isset($user->address->district_id) ? decrypt($user->address->district_id) : '' }}";
+    var state_id = "{{ isset($user->address->state_id) ? $user->address->state_id : '' }}";
+    var district_id = "{{ isset($user->address->district_id) ? $user->address->district_id : '' }}";
 
 
     $.ajax({

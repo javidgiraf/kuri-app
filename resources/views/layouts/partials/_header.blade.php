@@ -211,15 +211,26 @@
             <li>
               <hr class="dropdown-divider">
             </li> --}}
-            <a class="dropdown-item d-flex align-items-center" href="{{route('cache.clear')}}">
+            <a class="dropdown-item d-flex align-items-center btnClearCache" href="#">
               <i class="bi bi-question-circle"></i>
               <span>Clear Cache</span>
             </a>
+            @can(['password.change'])
             <li>
               <hr class="dropdown-divider">
             </li>
             <li>
-              <a href="{{route('cache.clear')}}"></a>
+              <a class="dropdown-item d-flex align-items-center" href="{{ route('password.change') }}">
+                <i class="bi bi-lock"></i>
+                <span>Change Password</span>
+              </a>
+            </li>
+            @endcan
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              
               <a class="dropdown-item d-flex align-items-center" href="{{route('logout')}}" onclick="event.preventDefault();
                document.getElementById('logout-form').submit();">
                 <i class="bi bi-box-arrow-right"></i>

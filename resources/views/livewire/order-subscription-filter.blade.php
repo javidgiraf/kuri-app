@@ -120,21 +120,21 @@
                         @foreach($deposits as $deposit)
                         <tr>
                             <th scope="row">{{ $deposits->firstitem() + $loop->index }}</th>
-                            <td>{{$deposit->subscription?->user?->name}}</td>
-                            <td>{{$deposit->order_id}}</td>
-                            <td>{{date('d-m-Y', strtotime($deposit->paid_at))}}</td>
-                            <td>{{$deposit->subscription?->scheme?->title}}</td>
+                            <td>{{ $deposit->subscription?->user?->name }}</td>
+                            <td>{{ $deposit->order_id }}</td>
+                            <td>{{ date('d-m-Y', strtotime($deposit->paid_at)) }}</td>
+                            <td>{{ $deposit->subscription?->scheme?->title }}</td>
 
                             <td>
-                                ₹ {{number_format($deposit->total_scheme_amount,2)}}
+                                {{ \App\Models\Setting::CURRENCY }} {{ number_format($deposit->total_scheme_amount, 2) }}
                             </td>
-                            <td>₹ {{number_format($deposit->service_charge,2)}}</td>
-                            <td>₹ {{number_format($deposit->gst_charge,2)}}</td>
+                            <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($deposit->service_charge, 2) }}</td>
+                            <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($deposit->gst_charge, 2) }}</td>
                             <td>
-                                ₹ {{number_format($deposit->final_amount,2)}}
+                                {{ \App\Models\Setting::CURRENCY }} {{ number_format($deposit->final_amount, 2) }}
                             </td>
-                            <td>{{$deposit->user_type=='admin'?'Admin':'Customer'}}</td>
-                            <td>{{$deposit->payment_type}}</td>
+                            <td>{{ $deposit->user_type == 'admin' ? 'Admin' : 'Customer' }}</td>
+                            <td>{{ $deposit->payment_type }}</td>
 
                             <td id="deposit_order_id_{{$deposit->id}}">@if($deposit->status=='1') Success @elseif($deposit->status=='2') Failed @else Processed @endif</td>
 

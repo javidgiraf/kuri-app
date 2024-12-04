@@ -11,10 +11,13 @@ class Setting extends Model
     use HasFactory;
     use SoftDeletes;
 
+    const CURRENCY = "₹";
+
     protected $fillable = [
         'option_name',
         'option_code',
         'option_value',
+        'symbol',
         'status'
     ];
 }

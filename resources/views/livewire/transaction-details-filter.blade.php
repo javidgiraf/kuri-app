@@ -136,21 +136,21 @@
                 @if($transactionDetail->payment_method!='cash')
                 <tr>
                     <th scope="row">{{ $transactionDetails->firstitem() + $loop->index }}</th>
-                    <td>{{$transactionDetail->deposit?->subscription?->user->name}}</td>
-                    <td>{{$transactionDetail->deposit?->order_id}}</td>
-                    <td>{{date('d-m-Y', strtotime($transactionDetail->deposit?->paid_at))}}</td>
-                    <td>{{$transactionDetail->deposit?->subscription?->scheme?->title}}</td>
+                    <td>{{ $transactionDetail->deposit?->subscription?->user->name }}</td>
+                    <td>{{ $transactionDetail->deposit?->order_id }}</td>
+                    <td>{{ date('d-m-Y', strtotime($transactionDetail->deposit?->paid_at)) }}</td>
+                    <td>{{ $transactionDetail->deposit?->subscription?->scheme?->title }}</td>
 
                     <td>
-                        ₹ {{number_format($transactionDetail->deposit?->total_scheme_amount,2)}}
+                        {{ \App\Models\Setting::CURRENCY }} {{ number_format($transactionDetail->deposit?->total_scheme_amount, 2) }}
                     </td>
-                    <td>₹ {{number_format($transactionDetail->deposit?->service_charge,2)}}</td>
-                    <td>₹ {{number_format($transactionDetail->deposit?->gst_charge,2)}}</td>
+                    <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($transactionDetail->deposit?->service_charge, 2) }}</td>
+                    <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($transactionDetail->deposit?->gst_charge, 2) }}</td>
                     <td>
-                        ₹ {{number_format($transactionDetail->deposit?->final_amount,2)}}
+                        {{ \App\Models\Setting::CURRENCY }} {{ number_format($transactionDetail->deposit?->final_amount, 2) }}
                     </td>
-                    <td>{{$transactionDetail->deposit?->user_type=='admin'?'Admin':'Customer'}}</td>
-                    <td>{{$transactionDetail->deposit?->payment_type}}</td>
+                    <td>{{ $transactionDetail->deposit?->user_type == 'admin' ? 'Admin' : 'Customer' }}</td>
+                    <td>{{ $transactionDetail->deposit?->payment_type }}</td>
 
 
 

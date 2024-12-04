@@ -57,7 +57,7 @@ class CountryController extends Controller
     public function getStates(Request $request, CountryService $countryService)
     {
         $input = $request->all();
-        $country_id = decrypt($input['country_id']);
+        $country_id = $input['country_id'];
         $states = $countryService->getStatesbyCountry($country_id);
         if ($input['state_id'] == "") {
 
@@ -65,7 +65,7 @@ class CountryController extends Controller
                 ->with(compact('states'))
                 ->render();
         } else {
-            $state_id = decrypt($input['state_id']);
+            $state_id = $input['state_id'];
 
             $data2 =  view('partials._states')
                 ->with(compact('states', 'state_id'))

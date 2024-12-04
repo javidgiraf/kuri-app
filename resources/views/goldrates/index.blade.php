@@ -71,7 +71,7 @@
                         <div class="row mb-3">
 
                             <div class="col-sm-10">
-                                <button type="submit" class="btn btn-primary">Submit Form</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
                             </div>
                         </div>
 
@@ -94,14 +94,14 @@
                         <h5 class="card-title">List of Gold Rates</h5>
 
                         <!-- Table with stripped rows -->
-                        <div class="card-title">
+                        
 
                             <form action="{{ route('goldrates.index') }}" method="GET" id="filterForm">
                                 <div class="row">
                                     <div class="col-lg-3 form-group">
                                         <label class="text-muted">From Date</label>
                                         <input type="date" name="from_date" class="form-control"
-                                            value="{{ request('from_date') && strtotime(request('from_date')) ? date('Y-m-d', strtotime(request('from_date'))) : date('Y-m-d') }}">
+                                            value="{{ request('from_date') && strtotime(request('from_date')) ? date('Y-m-d', strtotime(request('from_date'))) : date('Y-m-01') }}">
                                     </div>
                                     <div class="col-lg-3 form-group">
                                         <label class="text-muted">To Date</label>
@@ -117,8 +117,8 @@
                             </form>
 
 
-                        </div>
-                        <table class="table table-striped">
+                        
+                        <table class="table table-striped mt-4">
 
                             <thead>
                                 <tr>
@@ -136,9 +136,9 @@
                                 @foreach($goldrates as $goldrate)
                                 <tr>
                                     <th scope="row">{{ $goldrates->firstItem() + $loop->index }}</th>
-                                    <td>{{date('d-m-Y', strtotime($goldrate->date_on))}}</td>
-                                    <td>₹ {{ number_format($goldrate->per_gram,2)}}</td>
-                                    <td>₹ {{number_format($goldrate->per_pavan,2)}}</td>
+                                    <td>{{ date('d-m-Y', strtotime($goldrate->date_on)) }}</td>
+                                    <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($goldrate->per_gram, 2) }}</td>
+                                    <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($goldrate->per_pavan, 2) }}</td>
 
 
 

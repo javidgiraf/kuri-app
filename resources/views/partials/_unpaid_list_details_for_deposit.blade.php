@@ -39,8 +39,8 @@
                <input type="checkbox" id="{{$result_date['date']}}" class='permission'>
 
              </th>
-             <td id="date{{$result_date['date']}}">{{$result_date['date']}}</td>
-             <td id="amount{{$result_date['date']}}">{{$result_date['amount']}}</td>
+             <td id="date{{$result_date['date']}}">{{ $result_date['date'] }}</td>
+             <td id="amount{{$result_date['date']}}">{{ \App\Models\Setting::CURRENCY }} {{ number_format($result_date['amount'], 2) }}</td>
 
 
 

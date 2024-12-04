@@ -14,8 +14,9 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.3",
         "lcobucci/jwt": "^4.0",
-        "razorpay/razorpay": "2.*",
         "livewire/livewire": "*",
+        "maatwebsite/excel": "^3.1",
+        "razorpay/razorpay": "2.*",
         "spatie/laravel-permission": "^6.3",
         "twilio/sdk": "^7.13"
     },

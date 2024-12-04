@@ -94,18 +94,19 @@ class StateController extends Controller
     public function getDistricts(Request $request, StateService $stateService)
     {
         $input = $request->all();
-        $state_id = decrypt($input['state_id']);
+        $state_id = $input['state_id'];
         $districts = $stateService->getDistrictsbyState($state_id);
         if ($input['district_id'] == "") {
             $data2 =  view('partials._districts')
                 ->with(compact('districts'))
                 ->render();
         } else {
-            $district_id = decrypt($input['district_id']);
+            $district_id = $input['district_id'];
             $data2 =  view('partials._districts')
                 ->with(compact('districts', 'district_id'))
                 ->render();
         }
+
         return response()->json(['data' => $data2]);
     }
 }
