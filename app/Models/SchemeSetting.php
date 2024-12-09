@@ -12,4 +12,9 @@ class SchemeSetting extends Model
     protected $fillable = [
         'scheme_id', 'max_payable_amount', 'min_payable_amount', 'denomination', 'due_duration', 'status'
     ];
+
+    public function scheme()
+    {
+        return $this->belongsTo(Scheme::class, 'scheme_id', 'id');
+    }
 }

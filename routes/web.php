@@ -58,6 +58,7 @@ Auth::routes();
 Route::group(['middleware' => ['auth', 'permission']], function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index']);
+    Route::get('/scheme-chart-data', [App\Http\Controllers\HomeController::class, 'getSchemeChartData']);
     Route::resource('roles', RolesController::class);
     Route::resource('permissions', PermissionsController::class);
     Route::resource('admins', AdminController::class);
@@ -76,6 +77,7 @@ Route::group(['middleware' => ['auth', 'permission']], function () {
     Route::get('get-states', [CountryController::class, 'getStates'])->name('countries.get-states');
     Route::get('get-districts', [StateController::class, 'getDistricts'])->name('states.get-districts');
     Route::get('get-user-subscriptions', [UserController::class, 'getUserSubscriptions'])->name('users.get-user-subscriptions');
+    Route::get('subscriptionsExport', [UserController::class, 'subscriptionsExport'])->name('subscriptionsExport');
     Route::get('subscriptions', [UserController::class, 'userSubscriptions'])->name('subscriptions.index');
     Route::get('subscriptions-create', [UserController::class, 'subscriptionsCreate'])->name('subscriptions.create');
     Route::post('subscriptions-store', [UserController::class, 'subscriptionsStore'])->name('subscriptions.store');

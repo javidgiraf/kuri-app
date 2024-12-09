@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserSubscriptionExport;
 use App\Helpers\GenerateRandomNumber;
 use App\Http\Requests\UserCreatePostRequest;
 use App\Http\Requests\UserUpdatePostRequest;
@@ -20,6 +21,7 @@ use App\Models\UserSubscription;
 use App\Services\SchemeService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
 use PDO;
 use PhpParser\Node\Expr\Print_;
 
@@ -320,9 +322,9 @@ class UserController extends Controller
         $data2 =  view('partials._success_deposit_order_by_id_details')
             ->with(compact('success_deposit_by_order'))
             ->render();
+            
         return response()->json(['data' => $data2]);
     }
-
 
 
 
@@ -407,5 +409,20 @@ class UserController extends Controller
         $schemes = $schemeService->getActiveSchemes();
         $users =  $userService->getActiveUsers();
         return view('subscriptions.edit', compact('users', 'user_subscription', 'schemes'));
+    }
+
+    public function subscriptionsExport(Request $request)
+    {
+        $fromDate = $request->input('from_date') ? date('Y-m-d', strtotime($request->input('from_date'))) : null;
+        $toDate = $request->input('to_date') ? date('Y-m-d', strtotime($request->input('to_date'))) : null;
+
+        return Excel::download(new UserSubscriptionExport(
+            $request->input('user_id'),
+            $request->input('scheme_id'),
+            $request->input('mature_status'),
+            $request->input('scheme_status'),
+            $fromDate,
+            $toDate
+        ), 'user-subscriptions-report.xlsx');
     }
 }

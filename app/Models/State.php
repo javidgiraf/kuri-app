@@ -10,6 +10,7 @@ class State extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    
     protected $fillable = [
         'country_id',
         'name',
@@ -20,6 +21,6 @@ class State extends Model
 
     public function country()
     {
-        return $this->hasOne(Country::class, 'id', 'country_id')->withTrashed();
+        return $this->hasOne(Country::class, 'id', 'country_id');
     }
 }

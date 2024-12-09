@@ -42,7 +42,7 @@
 
                                 <tr>
                                     <th scope="row">{{ $states->firstItem() + $loop->index }}</th>
-                                    <td>{{$state->country->name}}</td>
+                                    <td>{{ ($state->country) ? $state->country->name : '' }}</td>
                                     <td>{{$state->name}}</td>
                                     <td>{{$state->code}}</td>
 

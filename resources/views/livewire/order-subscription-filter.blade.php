@@ -311,9 +311,6 @@
                     $('#enter-trasaction-details').show();
                     $('#fetch-trasaction-details').hide();
                 }
-
-
-
             },
             error: function(data) {
                 if (data.responseJSON.errors.transaction_no) {

@@ -32,8 +32,9 @@
               <thead>
                 <tr>
                   <th>No</th>
-                  <th scope="col">Max Payable Amount</th>
-                  <th scope="col">Min Payable Amount</th>
+                  <th scope="col">Scheme</th>
+                  <th scope="col">Max Payable</th>
+                  <th scope="col">Min Payable</th>
                   <th scope="col">Denomination</th>
                   <th scope="col">Due Duration</th>
                   <th scope="col">Status</th>
@@ -44,6 +45,7 @@
                 @foreach ($schemeSettings as $setting)
                 <tr>
                   <td>{{ $loop->iteration + ($schemeSettings->currentPage() - 1) * $schemeSettings->perPage() }}</td>
+                  <td>{{ $setting->scheme->title }}</td>
                   <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->max_payable_amount, 2) }}</td>
                   <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->min_payable_amount, 2) }}</td>
                   <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($setting->denomination, 2) }}</td>

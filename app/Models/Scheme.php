@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Scheme extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
         'title',
-        'total_amount',
         'total_period',
-        'schedule_amount',
         'description',
         'status',
         'scheme_type_id'

@@ -38,7 +38,7 @@ class HoldSchema extends Command
     {
         try {
             $userSubscriptions = UserSubscription::with('scheme')->get();
-            $userSubscriptions->map(function ($userSubscription) {
+            collect($userSubscriptions)->map(function ($userSubscription) {
                 $subscriptionStart = Carbon::parse($userSubscription->start_date);
                 $subscriptionEnd = Carbon::parse($userSubscription->end_date);
         

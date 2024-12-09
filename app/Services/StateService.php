@@ -13,7 +13,7 @@ class StateService
 
     public function getStates(int $perPage = 10): Object
     {
-        return State::paginate($perPage);
+        return State::with('country')->paginate($perPage);
     }
 
     public function createState(array $userData): State
@@ -23,7 +23,6 @@ class StateService
             'name'    => $userData['name'],
             'code'    => $userData['code'],
             'status'    => $userData['status'],
-
         ];
         $state = State::create($create);
         return $state;
@@ -31,7 +30,7 @@ class StateService
 
     public function getState($id): Object
     {
-        return State::find($id);
+        return State::with('country')->find($id);
     }
 
 

@@ -36,7 +36,7 @@
                                 <select wire:model="user_id" class="form-control" wire:change="user_table_filer" id="user_id">
                                     <option value="">Select User</option>
                                     @foreach($users as $user)
-                                    <option value="{{$user->id}}">{{$user->name}}</option>
+                                    <option <?= request('user_id') == $user->id ? 'selected' : '' ?> value="{{$user->id}}">{{$user->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -46,7 +46,7 @@
                                 <select wire:model="scheme_id" class="form-control" wire:change="scheme_table_filer" id="scheme_id">
                                     <option value="">Select scheme</option>
                                     @foreach($schemes as $scheme)
-                                    <option value="{{$scheme->id}}">{{$scheme->title}}</option>
+                                    <option <?= request('scheme_id') == $scheme->id ? 'selected' : '' ?> value="{{$scheme->id}}">{{$scheme->title}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -66,7 +66,7 @@
                                 <select wire:model="scheme_status" class="form-control" wire:change="scheme_status_table_filer" id="scheme_status">
                                     <option value="">Select Status</option>
                                     <option value="1">Active</option>
-                                    <option value="0">De Active</option>
+                                    <option value="0">In active</option>
                                     <option value="2">Discontinue</option>
                                     <option value="3">Oh Hold</option>
 
@@ -83,17 +83,19 @@
                         <div class=" col-md-3">
                             <input type="date" wire:model="to_date" class="date form-control" id="to_date" wire:change="date_id_filer">
                         </div>
-
-                    </div>
-
-                    <div class="row md">
-
-
+                        
                         <div class="col-md-3">
                             <button wire:click="resetOnClick" class="btn btn-primary" id="reset">Reset</button>
                         </div>
 
+                        @can(['subscriptionsExport'])
+                        <div class="col-md-3">
+                            <a class="btn btn-success btnExport" onclick="updateExportUrl();">Export To Excel</a>
+                        </div>
+                        @endcan
                     </div>
+
+                   
                     <div style="overflow-x:auto;">
                         <table class="table table-striped" style="width: 120%;">
                             {{-- <div style='text-align: end' ;><a href="{{route('districts.create')}}" class="btn btn-primary"><i class="bi bi-align-middle"></i><span>Add District</span></a>
@@ -119,7 +121,7 @@
                             <th scope="row">{{ $userSubscriptions->firstitem() + $loop->index }}</th>
                             <td>{{$userSubscription->user?->name}}</td>
                             <td>{{$userSubscription->scheme?->title}}</td>
-                        
+
                             <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($userSubscription->subscribe_amount, 2) }}</td>
                             <td>
                                 @php $totalAmount = 0; @endphp
@@ -188,23 +190,56 @@
 </section>
 @push('scripts')
 <script>
-    $('#user_id').on('change', function(e) {
+    let baseUrl = "{{ route('users.get-user-subscriptions') }}";
+    let exportUrl = "{{ route('subscriptionsExport') }}";
+
+    function updateExportUrl() {
+        // Collect filter values
         var user_id = $('#user_id').val();
-        @this.set('user_id', user_id);
-    });
-    $('#scheme_id').on('change', function(e) {
         var scheme_id = $('#scheme_id').val();
-        @this.set('scheme_id', scheme_id);
-    });
-
-    $('#mature_status').on('change', function(e) {
         var mature_status = $('#mature_status').val();
-        @this.set('mature_status', mature_status);
+        var scheme_status = $('#scheme_status').val();
+        var from_date = $('#from_date').val();
+        var to_date = $('#to_date').val();
+
+        // Construct query parameters
+        var queryParams = [];
+        if (user_id) queryParams.push('user_id=' + user_id);
+        if (scheme_id) queryParams.push('scheme_id=' + scheme_id);
+        if (mature_status) queryParams.push('mature_status=' + mature_status);
+        if (scheme_status) queryParams.push('scheme_status=' + scheme_status);
+        if (from_date) queryParams.push('from_date=' + from_date);
+        if (to_date) queryParams.push('to_date=' + to_date);
+
+        // Update export button URL
+        let newExportUrl = exportUrl + (queryParams.length ? '?' + queryParams.join('&') : '');
+        $('.btnExport').attr('href', newExportUrl);
+    }
+
+    function updateUrlAndLivewire(property, value) {
+        @this.set(property, value);
+        updateExportUrl();
+    }
+
+    $('#user_id').on('change', function() {
+        updateUrlAndLivewire('user_id', $(this).val());
     });
 
-    $('#scheme_status').on('change', function(e) {
-        var scheme_status = $('#scheme_status').val();
-        @this.set('scheme_status', scheme_status);
+    $('#scheme_id').on('change', function() {
+        updateUrlAndLivewire('scheme_id', $(this).val());
+    });
+
+    $('#mature_status').on('change', function() {
+        updateUrlAndLivewire('mature_status', $(this).val());
+    });
+
+    $('#scheme_status').on('change', function() {
+        updateUrlAndLivewire('scheme_status', $(this).val());
+    });
+
+    $('#from_date, #to_date').on('change', function() {
+        updateUrlAndLivewire('from_date', $('#from_date').val());
+        updateUrlAndLivewire('to_date', $('#to_date').val());
     });
 
     $(document).on('click', '.model', function() {

@@ -11,7 +11,7 @@ class SchemeSettingController extends Controller
 {
   public function index()
   {
-    $schemeSettings = SchemeSetting::paginate(10);
+    $schemeSettings = SchemeSetting::with('scheme')->paginate(10);
 
     return view('scheme_settings.index', compact('schemeSettings'));
   }

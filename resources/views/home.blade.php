@@ -20,9 +20,9 @@
                 <div class="row">
                     <!-- Revenue Card -->
                     <div class="col-xxl-4 col-md-6">
-                        <div class="card info-card revenue-card">
+                        <div class="card info-card customers-card">
 
-                            
+
 
                             <div class="card-body">
                                 <h5 class="card-title">{{ __('Customers') }}</h5>
@@ -43,90 +43,96 @@
                         </div>
                     </div><!-- End Revenue Card -->
 
-                    <!-- Sales Card -->
                     <div class="col-xxl-4 col-md-6">
-                        <div class="card info-card sales-card">
+                        <div class="card info-card revenue-card">
 
-                           
+
+
                             <div class="card-body">
-                                <h5 class="card-title">{{ __('Total Scheme Amount') }}</span></h5>
+                                <h5 class="card-title">{{ __('Schemes') }}</h5>
 
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-cart"></i>
+                                        <i class="bi bi-clipboard"></i>
                                     </div>
                                     <div class="ps-3">
-                                        <h6>145</h6>
-                                        <span class="text-muted small pt-2 ps-1">{{ __('Total Scheme Amount') }}</span>
+                                        <h6>{{ $schemesCount }}</h6>
+                                        <span class="text-muted small pt-2 ps-1">{{ __('Active Schemes') }}</span>
 
                                     </div>
                                 </div>
+
                             </div>
 
                         </div>
-                    </div><!-- End Sales Card -->
+                    </div><!-- End Revenue Card -->
 
 
 
-                    <div class="col-xxl-4 col-xl-12">
+                    <div class="col-xxl-4 col-md-12">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Scheme Chart</h5>
 
                                 <!-- Column Chart -->
-                                <div id="schemeChart"></div>
+                                <div id="columnChart"></div>
 
                                 <script>
                                     document.addEventListener("DOMContentLoaded", () => {
-                                        new ApexCharts(document.querySelector("#schemeChart"), {
-                                            series: [{
-                                                name: 'Scheme 1',
-                                                data: [44, 55, 57, 56, 61, 58, 63, 60, 66]
-                                            }, {
-                                                name: 'Scheme 2',
-                                                data: [76, 85, 101, 98, 87, 105, 91, 114, 94]
-                                            }, {
-                                                name: 'Scheme 3',
-                                                data: [35, 41, 36, 26, 45, 48, 52, 53, 41]
-                                            }],
-                                            chart: {
-                                                type: 'bar',
-                                                height: 350
-                                            },
-                                            plotOptions: {
-                                                bar: {
-                                                    horizontal: false,
-                                                    columnWidth: '55%',
-                                                    endingShape: 'rounded'
-                                                },
-                                            },
-                                            dataLabels: {
-                                                enabled: false
-                                            },
-                                            stroke: {
-                                                show: true,
-                                                width: 2,
-                                                colors: ['transparent']
-                                            },
-                                            xaxis: {
-                                                categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-                                            },
-                                            yaxis: {
-                                                title: {
-                                                    text: '$ (thousands)'
-                                                }
-                                            },
-                                            fill: {
-                                                opacity: 1
-                                            },
-                                            tooltip: {
-                                                y: {
-                                                    formatter: function(val) {
-                                                        return "$ " + val + " thousands"
+                                        // Fetch the chart data from the backend
+                                        fetch('/scheme-chart-data') // Replace with your actual endpoint
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                // Render the grouped bar chart with fetched data
+                                                new ApexCharts(document.querySelector("#columnChart"), {
+                                                    series: data.chartData, // Array containing data for each scheme
+                                                    chart: {
+                                                        type: 'bar', // Bar chart type
+                                                        height: 350, // Chart height
+                                                    },
+                                                    plotOptions: {
+                                                        bar: {
+                                                            horizontal: false, // Vertical bars
+                                                            columnWidth: '55%', // Column width
+                                                            endingShape: 'rounded', // Rounded corners
+                                                        },
+                                                    },
+                                                    dataLabels: {
+                                                        enabled: false, // Disable data labels on the bars
+                                                    },
+                                                    stroke: {
+                                                        show: true, // Show stroke on bars
+                                                        width: 2, // Stroke width
+                                                        colors: ['transparent'], // Stroke color
+                                                    },
+                                                    xaxis: {
+                                                        categories: data.categories, // The months (Jan - Dec)
+                                                        title: {
+                                                            text: "Months"
+                                                        },
+                                                    },
+                                                    yaxis: {
+                                                        title: {
+                                                            text: "Total Scheme Amount (<?= \App\Models\Setting::CURRENCY ?>)" // Y-axis label
+                                                        }
+                                                    },
+                                                    fill: {
+                                                        opacity: 1, // Bar fill opacity
+                                                    },
+                                                    tooltip: {
+                                                        y: {
+                                                            formatter: function(val) {
+                                                                return "<?= \App\Models\Setting::CURRENCY ?> " + val.toLocaleString(); // Format tooltip
+                                                            }
+                                                        }
+                                                    },
+                                                    legend: {
+                                                        position: 'top', // Position of the legend
+                                                        horizontalAlign: 'center', // Horizontal alignment
                                                     }
-                                                }
-                                            }
-                                        }).render();
+                                                }).render();
+                                            })
+                                            .catch(error => console.error('Error fetching chart data:', error));
                                     });
                                 </script>
                                 <!-- End Column Chart -->
@@ -134,6 +140,8 @@
                             </div>
                         </div>
                     </div>
+
+
 
                     <!-- Upcoming Payments -->
                     <div class="col-12">
@@ -153,7 +161,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        
+                                        @foreach($latestPayments as $latestPayment)
+                                        <tr>
+                                            <th scope="row">{{ $loop->iteration }}</th>
+                                            <td>{{ $latestPayment->userSubscription->user->name }}</td>
+                                            <td>{{ $latestPayment->userSubscription->scheme->title }}</td>
+                                            <td>{{ date('d/m/Y', strtotime($latestPayment->paid_at)) }}</td>
+                                            <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($latestPayment->total_scheme_amount, 2) }}</td>
+                                        </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
 
@@ -161,7 +177,7 @@
 
                         </div>
                     </div><!-- End Upcoming Payments -->
-                    
+
                     <!-- Old Payments -->
                     <div class="col-12">
                         <div class="card recent-sales overflow-auto">
@@ -180,7 +196,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        
+                                        @foreach($oldestPayments as $oldestPayment)
+                                        <tr>
+                                            <th scope="row">{{ $loop->iteration }}</th>
+                                            <td>{{ $oldestPayment->userSubscription->user->name }}</td>
+                                            <td>{{ $oldestPayment->userSubscription->scheme->title }}</td>
+                                            <td>{{ date('d/m/Y', strtotime($oldestPayment->paid_at)) }}</td>
+                                            <td>{{ \App\Models\Setting::CURRENCY }} {{ number_format($oldestPayment->total_scheme_amount, 2) }}</td>
+                                        </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
 
@@ -239,26 +263,17 @@
 
                 <!-- Website Traffic -->
                 <div class="card">
-                    <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                                <h6>Filter</h6>
-                            </li>
 
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                    </div>
 
                     <div class="card-body pb-0">
-                        <h5 class="card-title">Website Traffic <span>| Today</span></h5>
+                        <h5 class="card-title">Scheme Chart</h5>
 
                         <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
 
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
+                                const schemes = @json($schemes); // Pass the PHP array to JavaScript
+
                                 echarts.init(document.querySelector("#trafficChart")).setOption({
                                     tooltip: {
                                         trigger: 'item'
@@ -268,7 +283,7 @@
                                         left: 'center'
                                     },
                                     series: [{
-                                        name: 'Access From',
+                                        name: 'Scheme Amounts',
                                         type: 'pie',
                                         radius: ['40%', '70%'],
                                         avoidLabelOverlap: false,
@@ -286,37 +301,15 @@
                                         labelLine: {
                                             show: false
                                         },
-                                        data: [{
-                                                value: 1048,
-                                                name: 'Search Engine'
-                                            },
-                                            {
-                                                value: 735,
-                                                name: 'Direct'
-                                            },
-                                            {
-                                                value: 580,
-                                                name: 'Email'
-                                            },
-                                            {
-                                                value: 484,
-                                                name: 'Union Ads'
-                                            },
-                                            {
-                                                value: 300,
-                                                name: 'Video Ads'
-                                            }
-                                        ]
+                                        data: schemes // Use the data from the backend
                                     }]
                                 });
                             });
                         </script>
-
                     </div>
-                </div><!-- End Website Traffic -->
 
-                <!-- News & Updates Traffic -->
-                {{-- <div class="card">
+                    <!-- News & Updates Traffic -->
+                    {{-- <div class="card">
                     <div class="filter">
                         <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -369,11 +362,17 @@
                     </div>
                 </div> --}}<!-- End News & Updates -->
 
-            </div><!-- End Right side columns -->
+                </div><!-- End Right side columns -->
 
-        </div>
+            </div>
     </section>
 
 </main><!-- End #main -->
 
 @endsection
+
+@push('scripts')
+<script>
+
+</script>
+@endpush
