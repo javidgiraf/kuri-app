@@ -129,7 +129,7 @@ use App\Services\UserService;
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody>
