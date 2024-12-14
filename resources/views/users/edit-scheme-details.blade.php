@@ -3,12 +3,12 @@
 
 <main id="main" class="main">
   <div class="pagetitle">
-    <h1>User Subscription</h1>
+    <h1>Customer Subscription</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{route('home')}}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{route('users.index')}}">Users</a></li>
-        <li class="breadcrumb-item active">Update User Subscription</li>
+        <li class="breadcrumb-item"><a href="{{route('users.index')}}">Customers</a></li>
+        <li class="breadcrumb-item active">Update Customer Subscription</li>
       </ol>
     </nav>
   </div><!-- End Page Title -->
